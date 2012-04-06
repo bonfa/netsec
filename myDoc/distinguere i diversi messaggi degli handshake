@@ -1,0 +1,8 @@
+Si analizzano i campi del campo key-type
+
+Se il messaggio ha KEY-TYPE = 1 ----> l'handshake è un 4-way handshake
+Se il messaggio ha KEY-TYPE = 0 ----> l'handshake è un group-key handshake
+
+
+4 WAY HANDSHAKE
+Il messaggio 1 ha il campo 

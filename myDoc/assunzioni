@@ -1,0 +1,35 @@
+L'applicazione può funzionare in due modalità:
+  1) offline
+  2) online
+
+
+1) Offline:
+   1.0) La PSK è nota
+   1.1) Si sniffano 4 pacchetti di un 4 WAY HANDSHAKE e i 2 del GROUP KEY HANDSHAKE seguente(??).
+   1.2) Si legge il primo pacchetto
+		Si estrae il campo ANonce
+		Si estrae l'indirizzo del sender (AP)
+		Si estrae l'indirizzo del receiver (STA) (e si controlla che sia quello del supplicant)
+   1.3) Si legge il secondo pacchetto (quello che è stato mandato)
+		Si estrae il campo SNonce
+		Si estrae l'indirizzo del sender (STA) (e si controlla che sia quello del supplicant)
+   1.4) Si generano le chiavi di sessione
+		Utilizzando ANonce, SNonce,indirizzo sender, indirizzo receiver, PSK si genera la PTK (procedimento a pagina 198 della RFC)
+		Dalla PTK si estraggono KCK, KEK, KT
+   1.5) Si verificano i vari campi dei pacchetti:
+		Pacchetto 2: si verifica il MIC ---> KCK è corretta
+		Pacchetto 3: si decripta con la KEK
+			     si calcola il MIC 
+			     si verifica il MIC ---> KEK e KCK sono corrette
+		Pacchetto 4: si verifica il MIC ---> 
+
+OSS: in questo modo non si verifica che la KT sia corretta, ma essendo derivata dalla PTK con lo stesso metodo, si può assumere che lo sia
+
+
+2) Online:
+	da definire meglio
+	2.1)SNIFFER: riceve i pacchetti 1 e 3
+	2.2)INJECTOR: inietta i pacchetti 2 e 4
+	2.3)CORE: calcola le chiavi
+
+
