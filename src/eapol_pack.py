@@ -19,8 +19,8 @@ class eapol_packet:
 	riceve in ingresso header e payload e li salva nelle apposite variabili.
 	"""
 	def __init__(header,payload):
-		self.header = header;
-		self.payload = payload;
+		self.header = header
+		self.payload = payload
 
 	
 	"""
