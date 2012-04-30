@@ -5,7 +5,7 @@ Contiene le classi che rappresentano i pacchetti eapol
 """
 
 
-class EapolPacket():
+class EapolPacket:
 	"""
 	Classe eapol_packet
 
@@ -16,20 +16,21 @@ class EapolPacket():
 	"""
 
 
-	"""
-	Costruttore del pacchetto EAPOL:
-	riceve in ingresso header e payload e li salva nelle apposite variabili.
-	"""
 	def __init__(self, header, payload):
+		"""
+		Costruttore del pacchetto EAPOL:
+		riceve in ingresso header e payload e li salva nelle apposite variabili.
+		"""
 		self.header = header
 		self.payload = payload
 
 	
-	"""
-	Ritorna una stringa con i valori di tutti i campi del pacchetto in ordine:
-	I valori sono separati da uno spazio
-	"""
+	
 	def to_string(self):
+		"""
+		Ritorna una stringa con i valori di tutti i campi del pacchetto in ordine:
+		I valori sono separati da uno spazio
+		"""
 		return self.header.to_string() + ' ' + self.payload.to_string()
 
 
@@ -47,20 +48,22 @@ class EapolHeader:
 	"""
 
 
-	"""
-	Contruttore dell'header EAPOL:
-	riceve in ingresso i valori dei tre campi e li salva nelle apposite variabili.
-	"""
+	
 	def __init__(self, protocol_version, packet_type, body_length):
+		"""
+		Contruttore dell'header EAPOL:
+		riceve in ingresso i valori dei tre campi e li salva nelle apposite variabili.
+		"""
 		self.protocol_version = protocol_version
 		self.packet_type = packet_type
 		self.body_length = body_length
 
  	
-	"""
-	Ritorna una stringa con i tre valori dell'header in ordine, separati da uno spazio.
-	"""
+	
 	def to_string(self):
+		"""
+		Ritorna una stringa con i tre valori dell'header in ordine, separati da uno spazio.
+		"""
 		head_str = str(self.protocol_version) + ' '
 		head_str = head_str + str(self.packet_type) + ' '
 		head_str = head_str + str(self.body_length)
@@ -89,11 +92,12 @@ class EapolPayload:
 	"""
 
 
-	"""
-	Contruttore del payload EAPOL:
-	riceve in ingresso i valori dei campi e li salva nelle apposite variabili.
-	"""
+	
 	def __init__(self, descriptor_type, key_information, key_length, key_replay_counter, key_nonce, eapol_key_iv, key_rsc, reserved, key_mic, key_data_length, key_data):
+		"""
+		Contruttore del payload EAPOL:
+		riceve in ingresso i valori dei campi e li salva nelle apposite variabili.
+		"""
 		self.descriptor_type = descriptor_type
 		self.key_information = key_information
 		self.key_length = key_length
@@ -106,11 +110,12 @@ class EapolPayload:
 		self.key_data_length = key_data_length
 		self.key_data = key_data
 
-	"""
-	Ritorna una stringa con i valori  del payload in ordine:
-	I valori sono separati da uno spazio
-	"""
+	
 	def to_string(self):
+		"""
+		Ritorna una stringa con i valori  del payload in ordine:
+		I valori sono separati da uno spazio
+		"""
 		payload_str = '' + str(self.descriptor_type) + ' '
 		payload_str = payload_str + self.key_information.to_string() + ' '
 		payload_str = payload_str + str(self.key_length) + ' '
@@ -147,11 +152,12 @@ class EapolKeyInformationField:
 	"""
 	
 
-	"""
-	Contruttore del campo key_information del pacchetto EAPOL:
-	riceve in ingresso i valori dei campi e li salva nelle apposite variabili.
-	"""	
+		
 	def __init__(self, key_descriptor_version, key_type, reserved, install, key_ack, key_mic, secure, error, request, encrypted_key_data, smk_message, reserved_2):
+		"""
+		Contruttore del campo key_information del pacchetto EAPOL:
+		riceve in ingresso i valori dei campi e li salva nelle apposite variabili.
+		"""
 		self.key_descriptor_version = key_descriptor_version
 		self.key_type = key_type
 		self.reserved = reserved
@@ -166,10 +172,11 @@ class EapolKeyInformationField:
 		self.reserved_2 = reserved_2
 
 
-	"""
-	Ritorna una stringa con i valori dei sotto-campi in ordine separati da uno spazio.
-	"""
+	
 	def to_string(self):
+		"""
+		Ritorna una stringa con i valori dei sotto-campi in ordine separati da uno spazio.
+		"""
 		key_information_string = ''
 		key_information_string = key_information_string + self.key_descriptor_version + ' '
 		key_information_string = key_information_string + self.key_type + ' '
@@ -197,23 +204,25 @@ class EapolKeyDataField:
 	(questo perchè ai fini dell'elaborato non dovrebbe essere importante)
 	"""
 
-	"""
-	Costruttore:
-	riceve i dati e li imposta nel campo data
-	"""	
+		
 	def __init__(self, data):
+		"""
+		Costruttore:
+		riceve i dati e li imposta nel campo data
+		"""
 		self.data = data
 
-	"""
-	Ritorna una stringa con i dati contenuti nel campo KEY_DATA
-	"""
+	
 	def to_string(self):
+		"""
+		Ritorna una stringa con i dati contenuti nel campo KEY_DATA
+		"""
 		return str(self.data)
 
 
 
 
-class KdeFormatKeyDataField(eapol_key_data_field):
+class KdeFormatKeyDataField(EapolKeyDataField):
 	"""
 	Classe kde_format_key_data_field 
 
@@ -228,11 +237,12 @@ class KdeFormatKeyDataField(eapol_key_data_field):
 	"""
 
 
-	"""
-	Contruttore:
-	riceve in ingresso i valori dei campi e li salva nelle apposite variabili.
-	"""
+	
 	def __init__(self, typ, length, oui, data_type, data):
+		"""
+		Contruttore:
+		riceve in ingresso i valori dei campi e li salva nelle apposite variabili.
+		"""
 		self.typ = typ
 		self.length = length
 		self.oui = oui
@@ -240,10 +250,11 @@ class KdeFormatKeyDataField(eapol_key_data_field):
 		self.data = data
 
 
-	"""
-	Ritorna una stringa con i dati contenuti nel campo KEY_DATA nel formato KDE
-	"""
+	
 	def to_string(self):
+		"""
+		Ritorna una stringa con i dati contenuti nel campo KEY_DATA nel formato KDE
+		"""
 		key_data_string = ''
 		key_data_string = key_data_string + str(self.typ) + ' '
 		key_data_string = key_data_string + str(self.length) + ' '
@@ -254,35 +265,37 @@ class KdeFormatKeyDataField(eapol_key_data_field):
 
 
 
-class GtkFormatKeyDataField():
+class GtkFormatKeyDataField:
 	"""
 	Classe gtk_format_key_data_field 
 
 	Questa classe rappresenta il campo KEY_DATA.DATA di un pacchetto eapol nel caso GTK KDE
 	I sotto-campi presenti in questo campo sono i seguenti:
 	KeyID: [2 bit]
-	tx: [2 bit]
+	txx: [2 bit]
 	reserved: [4 bit]
 	gtk: [(length-6) byte]
 	"""
 
 
-	"""
-	Contruttore:
-	riceve in ingresso i valori dei campi e li salva nelle apposite variabili.
-	"""
-	def __init__(self, keyID, tx, reserved, gtk):
-		self.keyID = keyID
-		self.tx = tx
+	
+	def __init__(self, key_id, txx, reserved, gtk):
+		"""
+		Contruttore:
+		riceve in ingresso i valori dei campi e li salva nelle apposite variabili.
+		"""
+		self.key_id = key_id
+		self.txx = txx
 		self.reserved = reserved
 		self.gtk = gtk
 
-	"""
-	Ritorna una stringa con i dati contenuti nel campo ordinati separati da uno spazio
-	"""
+	
 	def to_string(self):
+		"""
+		Ritorna una stringa con i dati contenuti nel campo ordinati separati da uno spazio
+		"""
 		data_field_str = ''
-		data_field_str = data_field_str + self.keyID + ' '
-		data_field_str = data_field_str + self.tx + ' '
+		data_field_str = data_field_str + self.key_id + ' '
+		data_field_str = data_field_str + self.txx + ' '
 		data_field_str = data_field_str + self.reserved + ' '
 		data_field_str = data_field_str + self.gtk + ' '

@@ -1,9 +1,11 @@
 #/usr/bin/python
 # -*- coding: utf-8 -*-
+"""
+Contiene le classi che rappresentano i frame ethernet
+"""
 
 
-
-class ethernet_II_frame:
+class EthernetIIFrame:
 	"""
 	Classe ethernet_II_frame
 
@@ -17,26 +19,27 @@ class ethernet_II_frame:
 	"""
 
 
-	"""
-	Costruttore del pacchetto EAPOL:
-	riceve in ingresso header e payload e li salva nelle apposite variabili.
-	"""
-	def __init__(header,payload):
-		self.header = header;
-		self.payload = payload;
+	def __init__(self, header, payload):
+		"""
+		Costruttore del pacchetto EAPOL:
+		riceve in ingresso header e payload e li salva nelle apposite variabili.
+		"""
+		self.header = header
+		self.payload = payload
 
 	
-	"""
-	Ritorna una stringa con i valori di tutti i campi del pacchetto in ordine:
-	I valori sono separati da uno spazio
-	"""
-	def toString():
-		return self.header.toString() + ' ' + self.payload.toString()
+	
+	def to_string(self):
+		"""
+		Ritorna una stringa con i valori di tutti i campi del pacchetto in ordine:
+		I valori sono separati da uno spazio
+		"""
+		return self.header.to_string() + ' ' + self.payload.to_string()
 
 
 
 
-class ethernet_II_header:
+class EthernetIIHeader:
 	"""
 	Classe ethernet_II_header
 
@@ -54,11 +57,12 @@ class ethernet_II_header:
 	"""
 
 
-	"""
-	Contruttore dell'header ETHERNET II:
-	riceve in ingresso i valori dei campi e li salva nelle apposite variabili.
-	"""
-	def __init__(preamble,destination_address,source_address,ether_type,padding,frame_check_sequence):
+	
+	def __init__(self, preamble, destination_address, source_address, ether_type, padding, frame_check_sequence):
+		"""
+		Contruttore dell'header ETHERNET II:
+		riceve in ingresso i valori dei campi e li salva nelle apposite variabili.
+		"""
 		self.preamble = preamble
 		self.destination_address = destination_address
 		self.source_address = source_address
@@ -66,10 +70,11 @@ class ethernet_II_header:
 		self.padding = padding
 		self.frame_check_sequence = frame_check_sequence
  	
-	"""
-	Ritorna una stringa con i valori dell'header in ordine, separati da uno spazio.
-	"""
-	def toString():
+	
+	def to_string(self):
+		"""
+		Ritorna una stringa con i valori dell'header in ordine, separati da uno spazio.
+		"""
 		head_str = str(self.preamble) + ' '
 		head_str = head_str + str(self.destination_address) + ' '
 		head_str = head_str + str(self.source_address) + ' '
