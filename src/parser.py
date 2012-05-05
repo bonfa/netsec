@@ -6,6 +6,7 @@ A partire dalla struttura che contiene i dati sniffati da wireshark crea dei nuo
 
 from eapol_pack import EapolPacket,EapolHeader,EapolPayload,EapolKeyInformationField,EapolKeyDataField,KdeFormatKeyDataField,GtkFormatKeyDataField
 from ether2_frame import EthernetIIFrame,EthernetIIHeader
+from exception import Error,packetKindNotManaged
 
 class Splitter:
 	'''
@@ -15,7 +16,7 @@ class Splitter:
 	'''
 	EAPOL_TYPE = '\x88\x8e'
 	ethernet_offset = 14
-
+	#ethernet_frame
 
 
 	
@@ -23,12 +24,15 @@ class Splitter:
 		'''
 		Il costruttore dal pacchetto separa il campo header e il payload e ritorna un oggetto che contiene i due attributi (header e payload) che a 			loro volta contengono tutte la variabili separate
 		'''
+		print '1.1'
 		header = self.get_ethernet_header(frame)
+		print 'h = ' + header.to_string()
+		print '1.2'
 		# passo l'array a partire dal primo byte del payload così non devo sommare l'offset ogni volta
 		payload = self.get_ethernet_payload(frame[self.ethernet_offset:],header.ether_type)
-		
+		print '1.3'
 		self.ethernet_frame = EthernetIIFrame(frame,payload)
-
+		print '1.4'
 
 
 	#@classmethod
@@ -41,6 +45,9 @@ class Splitter:
 		'''
 		# estraggo i campi dell'header e creo un oggetto che rappresenta l'header ethernet		
 		preamble = 0
+		#print 'L = ' + str(len(packet))
+		#p = packet
+		#print 'h='+hex(ord(p[0]))+hex(ord(p[1]))+hex(ord(p[2]))+hex(ord(p[3]))+hex(ord(p[4]))+hex(ord(p[5]))+hex(ord(p[6]))
 		dst_address = packet[0:6]
 		src_address = packet[6:12]
 		ether_type = packet[12:14]
@@ -59,10 +66,14 @@ class Splitter:
 
 		Funziona solo se il pacchetto è un pacchetto di tipo EAPOL
 		'''
+		print '2.1'
 		if ether_type == self.EAPOL_TYPE: 
+			print '2.2'
 			payload = self.get_eapol_packet(packet) 
+			print '2.3'
 			return payload
 		else:
+			print '2.2'
 			raise packetKindNotManaged('The content of the payload is not managed by the software')
 
 
@@ -73,10 +84,13 @@ class Splitter:
 		'''
 		Crea un oggetto di tipo eapol_packet
 		'''
+		print '3.1'
 		header = self.get_eapol_header(eapol_structure)
+		print '3.2'
 		payload = self.get_eapol_payload(eapol_structure[4:],header.body_length)
-		
+		print '3.3'
 		packet = EapolPacket(header,payload)
+		print '3.4'
 		return packet
 
 
@@ -98,8 +112,11 @@ class Splitter:
 		'''
 		Crea un oggetto di tipo eapol_payload a partire dal pacchetto eapol
 		'''
+		print '4.1'
 		descriptor_type = eapol_payload_structure[0:1]
+		print '4.2'
 		key_information = self.get_key_information(eapol_payload_structure[1:3])
+		print '4.3'
 		key_length = eapol_payload_structure[3:5]
 		key_replay_counter = eapol_payload_structure[5:13]
 		key_nonce = eapol_payload_structure[13:45]
@@ -108,8 +125,9 @@ class Splitter:
 		reserved = eapol_payload_structure[69:77]
 		key_mic = eapol_payload_structure[77:93]
 		key_data_length = eapol_payload_structure[93:95]
+		print '4.4'
 		key_data = self.get_eapol_key_data_field(eapol_payload_structure[95:95+key_data_length])
-		
+		print '4.5'
 		return (EapolPayload(descriptor_type,key_information,key_length,key_replay_counter,key_nonce,eapol_key_iv,key_rsc,reserved,key_mic,key_data_length, key_data))
 
 
@@ -119,20 +137,28 @@ class Splitter:
 		'''
 		Crea un oggetto di tipo key_information a partire dai due byte del pacchetto eapol che contengono questi campi
 		'''
-		key_descriptor_version = key_info_structure[1] & 7
-		key_type = key_info_structure[1] & 8
-		reserved = 0
-		install = key_info_structure[1] & 32
-		key_ack = key_info_structure[1] & 64
+		print '5.1'
+		print 'len =' + str(len(key_info_structure))
+		print 'key = ' + bin(ord(key_info_structure[0]))+bin(ord(key_info_structure[1]))
+		print 'key[0] = ' + bin(ord(key_info_structure[0]))
+		print 'key[1] = ' +bin(ord(key_info_structure[1]))
 
-		key_mic = key_info_structure[2] & 1
-		secure = key_info_structure[2] & 2
-		error = key_info_structure[2] & 4
-		request = key_info_structure[2] & 8
-		encrypted_key_data = key_info_structure[2] & 16
-		smk_message = key_info_structure[2] & 32
+		key_descriptor_version = ord(key_info_structure[1:2]) & 0b11100000 >> 5
+		key_type = ord(key_info_structure[1:2]) & 0b00010000 >> 4
+		reserved = 0
+		install = ord(key_info_structure[1:2]) & 0b00000010 >> 1
+		key_ack = ord(key_info_structure[1:2]) & 0b00000001
+
+		key_mic = ord(key_info_structure[0:1]) & 0b10000000 >> 7
+		secure = ord(key_info_structure[0:1]) & 0b01000000 >> 6
+		error = ord(key_info_structure[0:1]) & 0b00100000 >> 5
+		request = ord(key_info_structure[0:1]) & 0b00010000 >> 4
+		encrypted_key_data = ord(key_info_structure[0:1]) & 0b00001000 >> 3
+		smk_message = ord(key_info_structure[0:1]) & 0b000000100 >> 2
 		reserved_2 = 0
 		
+		print str(key_descriptor_version)+str(key_type)+str(reserved)+str(install)+str(key_ack)+str(key_mic)+str(secure)+str(error)+str(request)+str(encrypted_key_data)+str(smk_message)+str(reserved_2)
+		print '5.2'
 		return (EapolKeyInformationField(key_descriptor_version,key_type,reserved,install,key_ack,key_mic,secure,error,request,encrypted_key_data,smk_message,reserved_2))
 
 
