@@ -7,6 +7,7 @@ A partire dalla struttura che contiene i dati sniffati da wireshark crea dei nuo
 from eapol_pack import EapolPacket,EapolHeader,EapolPayload,EapolKeyInformationField,EapolKeyDataField,KdeFormatKeyDataField,GtkFormatKeyDataField
 from ether2_frame import EthernetIIFrame,EthernetIIHeader
 from exception import Error,packetKindNotManaged
+import my_debug
 
 class Splitter:
 	'''
@@ -126,7 +127,8 @@ class Splitter:
 		key_mic = eapol_payload_structure[77:93]
 		key_data_length = eapol_payload_structure[93:95]
 		print '4.4'
-		key_data = self.get_eapol_key_data_field(eapol_payload_structure[95:95+key_data_length])
+		print (bin(key_data_length))
+		key_data = self.get_eapol_key_data_field(eapol_payload_structure[95:95+ord(key_data_length)])
 		print '4.5'
 		return (EapolPayload(descriptor_type,key_information,key_length,key_replay_counter,key_nonce,eapol_key_iv,key_rsc,reserved,key_mic,key_data_length, key_data))
 
@@ -136,28 +138,35 @@ class Splitter:
 	def get_key_information(self,key_info_structure):
 		'''
 		Crea un oggetto di tipo key_information a partire dai due byte del pacchetto eapol che contengono questi campi
+		
+		Questo metodo separa la struttura nei due byte e ne legge i singoli campi. 
+		Di seguito c'è un breve riassunto dei flag e della loro posizione nella struttura (che è quella dalla rfc letta da dx)
+		
+		---------------------------------------------------------------------------------------------------------------------------------------
+		|	   |  SMK  |  Encrypted |	    |		|	   |	   ||   	|	  |	     |  key	|    key     |	
+		| reserved |  mex  |    Key	|  Request  | 	Error	|  Secure  |  Key  ||  Key Ack	| Install | Reserved |  type	| descriptor |
+		|	   |	   |	Data	|	    |		|      	   |  MIC  ||  	 	|	  |	     |	        |  version   |
+		---------------------------------------------------------------------------------------------------------------------------------------
+		   b0-1	      b2         b3          b4          b5 	     b6        b7        b8         b9       b10-11      b12        b13-15
 		'''
 		print '5.1'
-		print 'len =' + str(len(key_info_structure))
-		print 'key = ' + bin(ord(key_info_structure[0]))+bin(ord(key_info_structure[1]))
-		print 'key[0] = ' + bin(ord(key_info_structure[0]))
-		print 'key[1] = ' +bin(ord(key_info_structure[1]))
+		#my_debug.stampa_key_info_from_array(key_info_structure)
+		#my_debug.stampa_key_info_field_per_field(key_info_structure)
 
-		key_descriptor_version = ord(key_info_structure[1:2]) & 0b11100000 >> 5
-		key_type = ord(key_info_structure[1:2]) & 0b00010000 >> 4
+		key_descriptor_version = ord(key_info_structure[1:2]) & 0b00000111
+		key_type = (ord(key_info_structure[1:2]) & 0b00001000) >> 3
 		reserved = 0
-		install = ord(key_info_structure[1:2]) & 0b00000010 >> 1
-		key_ack = ord(key_info_structure[1:2]) & 0b00000001
+		install = (ord(key_info_structure[1:2]) & 0b01000000) >> 6
+		key_ack = (ord(key_info_structure[1:2]) & 0b10000000) >> 7
 
-		key_mic = ord(key_info_structure[0:1]) & 0b10000000 >> 7
-		secure = ord(key_info_structure[0:1]) & 0b01000000 >> 6
-		error = ord(key_info_structure[0:1]) & 0b00100000 >> 5
-		request = ord(key_info_structure[0:1]) & 0b00010000 >> 4
-		encrypted_key_data = ord(key_info_structure[0:1]) & 0b00001000 >> 3
-		smk_message = ord(key_info_structure[0:1]) & 0b000000100 >> 2
+		key_mic = (ord(key_info_structure[0:1]) & 0b00000001)
+		secure = (ord(key_info_structure[0:1]) &  0b00000010) >> 1
+		error = (ord(key_info_structure[0:1]) & 0b00000100) >> 2
+		request = (ord(key_info_structure[0:1]) & 0b00001000) >> 3
+		encrypted_key_data = (ord(key_info_structure[0:1]) & 0b00010000) >> 4
+		smk_message = (ord(key_info_structure[0:1]) & 0b00100000) >> 5
 		reserved_2 = 0
-		
-		print str(key_descriptor_version)+str(key_type)+str(reserved)+str(install)+str(key_ack)+str(key_mic)+str(secure)+str(error)+str(request)+str(encrypted_key_data)+str(smk_message)+str(reserved_2)
+
 		print '5.2'
 		return (EapolKeyInformationField(key_descriptor_version,key_type,reserved,install,key_ack,key_mic,secure,error,request,encrypted_key_data,smk_message,reserved_2))
 
@@ -170,15 +179,23 @@ class Splitter:
 		
 		Il campo viene trattato come se fosse sempre nel formato KDE (perchè ai fini dell'elaborato, serve solo questo)
 		'''
+		print '6.1'
 		typ = eapol_payload_structure[0:1]
 		length = eapol_payload_structure[1:2]
 		oui = eapol_payload_structure[2:5]
 		data_type = eapol_payload_structure[5:6]
 		
+		print '6.2'
 		if (data_type == 1): #GTK KDE
+			print '6.3.a'
 			data = self.get_eapol_key_gtk_field(eapol_payload_structure[6:6+length-4],length)
+			print '6.4.a'
 		else:
-			data = eapol_payload_structure[6:6+length-4]
+			print '6.3.b'
+			#print len(eapol_payload_structure)
+			#print ord(length)
+			data = eapol_payload_structure[6:(6+ord(length)-4)]
+			print '6.4.b'
 		
 		return KdeFormatKeyDataField(typ,length,oui,data_type,data)
 
