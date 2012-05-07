@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 Contiene le classi che rappresentano i frame ethernet
+I dati sono sequenze di bit. devono ancora essere interpretati come interi/flag/stringhe o quello che sono.
+(I metodi to_string servono a poco)
 """
 
 
@@ -17,7 +19,7 @@ class EthernetIIFrame:
 	L'header è contenuto nella classe ethernet_II_header.
 	Il payload, invece, è rappresentato dal pacchetto eapol contenuto nel file eapol_pack.py
 	"""
-
+	
 
 	def __init__(self, header, payload):
 		"""

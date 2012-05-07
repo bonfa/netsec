@@ -1,13 +1,17 @@
 #/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-A partire dalla struttura che contiene i dati sniffati da wireshark crea dei nuovi oggetti
+A partire dalla struttura che contiene i dati sniffati da wireshark crea dei nuovi oggetti.
+Per il momento funziona solo per i pacchetti ethernet II e eapol.
+I dati vengono salvati così come sono, come insiemi di bit. Non vengono interpretati in interi o altro, (a parte i bit del campo key information del pacchetto eapol)
 """
 
 from eapol_pack import EapolPacket,EapolHeader,EapolPayload,EapolKeyInformationField,EapolKeyDataField,KdeFormatKeyDataField,GtkFormatKeyDataField
 from ether2_frame import EthernetIIFrame,EthernetIIHeader
 from exception import Error,packetKindNotManaged
 import my_debug
+import packet_printer
+
 
 class Splitter:
 	'''
@@ -17,7 +21,7 @@ class Splitter:
 	'''
 	EAPOL_TYPE = '\x88\x8e'
 	ethernet_offset = 14
-	#ethernet_frame
+	
 
 
 	
@@ -27,7 +31,7 @@ class Splitter:
 		'''
 		print '1.1'
 		header = self.get_ethernet_header(frame)
-		print 'h = ' + header.to_string()
+		packet_printer.printEthernetHeader(header)
 		print '1.2'
 		# passo l'array a partire dal primo byte del payload così non devo sommare l'offset ogni volta
 		payload = self.get_ethernet_payload(frame[self.ethernet_offset:],header.ether_type)
@@ -36,7 +40,7 @@ class Splitter:
 		print '1.4'
 
 
-	#@classmethod
+	
 	def get_ethernet_header(self,packet):
 		'''
 		Crea un oggetto di tipo ethernet header.
@@ -46,9 +50,6 @@ class Splitter:
 		'''
 		# estraggo i campi dell'header e creo un oggetto che rappresenta l'header ethernet		
 		preamble = 0
-		#print 'L = ' + str(len(packet))
-		#p = packet
-		#print 'h='+hex(ord(p[0]))+hex(ord(p[1]))+hex(ord(p[2]))+hex(ord(p[3]))+hex(ord(p[4]))+hex(ord(p[5]))+hex(ord(p[6]))
 		dst_address = packet[0:6]
 		src_address = packet[6:12]
 		ether_type = packet[12:14]
@@ -87,8 +88,10 @@ class Splitter:
 		'''
 		print '3.1'
 		header = self.get_eapol_header(eapol_structure)
+		packet_printer.printEapolHeader(header)
 		print '3.2'
 		payload = self.get_eapol_payload(eapol_structure[4:],header.body_length)
+		packet_printer.printEapolPayload(payload)
 		print '3.3'
 		packet = EapolPacket(header,payload)
 		print '3.4'
@@ -114,7 +117,7 @@ class Splitter:
 		Crea un oggetto di tipo eapol_payload a partire dal pacchetto eapol
 		'''
 		print '4.1'
-		descriptor_type = eapol_payload_structure[0:1]
+		descriptor_type = ord(eapol_payload_structure[0:1])
 		print '4.2'
 		key_information = self.get_key_information(eapol_payload_structure[1:3])
 		print '4.3'
@@ -127,10 +130,11 @@ class Splitter:
 		key_mic = eapol_payload_structure[77:93]
 		key_data_length = eapol_payload_structure[93:95]
 		print '4.4'
-		print (bin(key_data_length))
-		key_data = self.get_eapol_key_data_field(eapol_payload_structure[95:95+ord(key_data_length)])
+		#print (ord(descriptor_type))
+		#print key_information
+		key_data = self.get_eapol_key_data_field(eapol_payload_structure[95:])
 		print '4.5'
-		return (EapolPayload(descriptor_type,key_information,key_length,key_replay_counter,key_nonce,eapol_key_iv,key_rsc,reserved,key_mic,key_data_length, key_data))
+		return EapolPayload(descriptor_type,key_information,key_length,key_replay_counter,key_nonce,eapol_key_iv,key_rsc,reserved,key_mic,key_data_length, key_data)
 
 
 

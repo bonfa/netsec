@@ -1,5 +1,8 @@
 #/usr/bin/python
 # -*- coding: utf-8 -*-
+'''
+Calcolatore: little endian
+'''
 
 import pcap
 import sys

@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 Contiene le classi che rappresentano i pacchetti eapol
+I dati sono sequenze di bit. devono ancora essere interpretati come interi/flag/stringhe o quello che sono (a parte le sequenze più corte di un byte)
+(I metodi to_string servono a poco)
 """
 
 
