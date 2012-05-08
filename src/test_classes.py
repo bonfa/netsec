@@ -19,15 +19,18 @@ if packet_list.open_offline(filename) == 0:
 	print 'error in opening file'
 	sys.exit()
 try:
+	numero = 0
 	while 1:
 	# metodo preso dalla libreria plibpcap
 		(pktlen, data, timestamp) = packet_list.next()
-		print '2'
+		numero = numero + 1
+		print '---[' + str(numero) + ']---'
+		#print '2'
 		# creo il separatore di pacchetti
 		separatore_pacchetti = Splitter(data)
-		print '3'	
+		#print '3'	
 		# creo il pacchetto che conterrà l'oggetto pacchetto
-		separatore_pacchetti.ethernet_frame.to_string()
+		#separatore_pacchetti.ethernet_frame.to_string()
 	print 'tutto ok'
 except packetKindNotManaged:
 	print 'pacchetto non gestito'

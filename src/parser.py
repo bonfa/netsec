@@ -29,15 +29,17 @@ class Splitter:
 		'''
 		Il costruttore dal pacchetto separa il campo header e il payload e ritorna un oggetto che contiene i due attributi (header e payload) che a 			loro volta contengono tutte la variabili separate
 		'''
-		print '1.1'
+		#print '1.1'
 		header = self.get_ethernet_header(frame)
 		packet_printer.printEthernetHeader(header)
-		print '1.2'
+		#print '1.2'
 		# passo l'array a partire dal primo byte del payload così non devo sommare l'offset ogni volta
 		payload = self.get_ethernet_payload(frame[self.ethernet_offset:],header.ether_type)
-		print '1.3'
+		#print '1.3'
 		self.ethernet_frame = EthernetIIFrame(frame,payload)
-		print '1.4'
+		#self.numero = self.numero + 1
+		#print '---[' + str(self.numero) + ']---'
+		#print '1.4'
 
 
 	
@@ -68,14 +70,14 @@ class Splitter:
 
 		Funziona solo se il pacchetto è un pacchetto di tipo EAPOL
 		'''
-		print '2.1'
+		#print '2.1'
 		if ether_type == self.EAPOL_TYPE: 
-			print '2.2'
+			#print '2.2'
 			payload = self.get_eapol_packet(packet) 
-			print '2.3'
+			#print '2.3'
 			return payload
 		else:
-			print '2.2'
+			#print '2.2'
 			raise packetKindNotManaged('The content of the payload is not managed by the software')
 
 
@@ -86,15 +88,15 @@ class Splitter:
 		'''
 		Crea un oggetto di tipo eapol_packet
 		'''
-		print '3.1'
+		#print '3.1'
 		header = self.get_eapol_header(eapol_structure)
 		packet_printer.printEapolHeader(header)
-		print '3.2'
+		#print '3.2'
 		payload = self.get_eapol_payload(eapol_structure[4:],header.body_length)
 		packet_printer.printEapolPayload(payload)
-		print '3.3'
+		#print '3.3'
 		packet = EapolPacket(header,payload)
-		print '3.4'
+		#print '3.4'
 		return packet
 
 
@@ -116,11 +118,11 @@ class Splitter:
 		'''
 		Crea un oggetto di tipo eapol_payload a partire dal pacchetto eapol
 		'''
-		print '4.1'
+		#print '4.1'
 		descriptor_type = eapol_payload_structure[0:1]
-		print '4.2'
+		#print '4.2'
 		key_information = self.get_key_information(eapol_payload_structure[1:3])
-		print '4.3'
+		#print '4.3'
 		key_length = eapol_payload_structure[3:5]
 		key_replay_counter = eapol_payload_structure[5:13]
 		key_nonce = eapol_payload_structure[13:45]
@@ -129,11 +131,11 @@ class Splitter:
 		reserved = eapol_payload_structure[69:77]
 		key_mic = eapol_payload_structure[77:93]
 		key_data_length = eapol_payload_structure[93:95]
-		print '4.4'
+		#print '4.4'
 		#print (ord(descriptor_type))
 		#print key_information
 		key_data = self.get_eapol_key_data_field(eapol_payload_structure[95:])
-		print '4.5'
+		#print '4.5'
 		return EapolPayload(descriptor_type,key_information,key_length,key_replay_counter,key_nonce,eapol_key_iv,key_rsc,reserved,key_mic,key_data_length, key_data)
 
 
@@ -153,7 +155,7 @@ class Splitter:
 		---------------------------------------------------------------------------------------------------------------------------------------
 		   b0-1	      b2         b3          b4          b5 	     b6        b7        b8         b9       b10-11      b12        b13-15
 		'''
-		print '5.1'
+		#print '5.1'
 		#my_debug.stampa_key_info_from_array(key_info_structure)
 		#my_debug.stampa_key_info_field_per_field(key_info_structure)
 
@@ -171,7 +173,7 @@ class Splitter:
 		smk_message = (ord(key_info_structure[0:1]) & 0b00100000) >> 5
 		reserved_2 = 0
 
-		print '5.2'
+		#print '5.2'
 		return (EapolKeyInformationField(key_descriptor_version,key_type,reserved,install,key_ack,key_mic,secure,error,request,encrypted_key_data,smk_message,reserved_2))
 
 
@@ -184,6 +186,7 @@ class Splitter:
 		Il campo viene trattato come se fosse sempre nel formato KDE (perchè ai fini dell'elaborato, serve solo questo)
 		'''
 		print '6.1'
+		print ' ' + str(len(eapol_payload_structure))
 		typ = eapol_payload_structure[0:1]
 		length = eapol_payload_structure[1:2]
 		oui = eapol_payload_structure[2:5]
@@ -196,8 +199,7 @@ class Splitter:
 			print '6.4.a'
 		else:
 			print '6.3.b'
-			#print len(eapol_payload_structure)
-			#print ord(length)
+			print ' ' + str(len(length))
 			data = eapol_payload_structure[6:(6+ord(length)-4)]
 			print '6.4.b'
 		

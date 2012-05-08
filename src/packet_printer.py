@@ -8,7 +8,10 @@ from eapol_pack import EapolPacket,EapolHeader,EapolPayload,EapolKeyInformationF
 from ether2_frame import EthernetIIFrame,EthernetIIHeader
 import socket
 import struct
+import sys
 
+
+indent = '   '
 
 def macAddressToString(addressInBit):
 	return ':'.join('%02x' % ord(b) for b in addressInBit)
@@ -41,16 +44,16 @@ def printEapolPayload(eapolPayload):
 	printEapolKeyInformationField(eapolPayload.key_information)
 	print '   KEY LENGTH = ' + str(socket.ntohs(struct.unpack('H',eapolPayload.key_length)[0]))
 	print '   KEY REPLAY COUNTER = ' + str((struct.unpack('Q',eapolPayload.key_replay_counter)[0]))
-	#print '   KEY NONCE = ' + 					eapolPayload.key_nonce
-	#print '   EAPOL KEY IV = ' + 					eapolPayload.eapol_key_iv
+	print '   KEY NONCE = ' + stringInHex(eapolPayload.key_nonce)
+	print '   EAPOL KEY IV = ' + stringInHex(eapolPayload.eapol_key_iv)
 	print '   KEY RSC = ' + str((struct.unpack('Q',eapolPayload.key_rsc)[0]))
 	print '   RESERVED = ' + str((struct.unpack('Q',eapolPayload.reserved)[0]))
-	#print '   KEY MIC = ' + eapolPayload.key_mic
+	print '   KEY MIC = ' + stringInHex(eapolPayload.key_mic)
 	print '   KEY DATA LENGTH = ' + str(socket.ntohs(struct.unpack('H',eapolPayload.key_data_length)[0]))
-	#printEapolKeyData(eapolPayload.key_data)	
+	printEapolKeyData(eapolPayload.key_data)	
+
 
 def printEapolKeyInformationField(KeyInformationField):
-	indent = '   '
 	print indent + 'KEY INFORMATION'
 	print 2*indent + 'key_descriptor_version = ' + str(KeyInformationField.key_descriptor_version)
 	print 2*indent + 'key_type = ' + str(KeyInformationField.key_type)
@@ -64,5 +67,26 @@ def printEapolKeyInformationField(KeyInformationField):
 	print 2*indent + 'encrypted_key_data = ' + str(KeyInformationField.encrypted_key_data)
 	print 2*indent + 'smk_message = ' + str(KeyInformationField.smk_message)
 	print 2*indent + 'reserved_2 = ' + str(KeyInformationField.reserved_2)
+
+
+def stringInHex(value):
+	string = ''
+	for b in value:
+		string = string + str(hex(ord(b))).replace('0x',' ')
+	return string
+	
+
+def printEapolKeyData(keyDataField):
+	print indent + 'KEY DATA'
+	print 2*indent + 'type = ' + str(ord(keyDataField.typ))
+	print 2*indent + 'length = ' + str(ord(keyDataField.length))
+	print 2*indent + 'OUI = ' + stringInHex(keyDataField.oui)
+	print 2*indent + 'data type = ' + str(ord(keyDataField.data_type))
+	printEapolKeyDataNoHeader(keyDataField.data)
+
+	
+def printEapolKeyDataNoHeader(data):
+	print 2*indent + 'data = ' + stringInHex(data)
+
 
 
