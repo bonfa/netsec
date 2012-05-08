@@ -117,7 +117,7 @@ class Splitter:
 		Crea un oggetto di tipo eapol_payload a partire dal pacchetto eapol
 		'''
 		print '4.1'
-		descriptor_type = ord(eapol_payload_structure[0:1])
+		descriptor_type = eapol_payload_structure[0:1]
 		print '4.2'
 		key_information = self.get_key_information(eapol_payload_structure[1:3])
 		print '4.3'
