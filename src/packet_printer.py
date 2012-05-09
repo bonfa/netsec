@@ -50,7 +50,10 @@ def printEapolPayload(eapolPayload):
 	print '   RESERVED = ' + str((struct.unpack('Q',eapolPayload.reserved)[0]))
 	print '   KEY MIC = ' + stringInHex(eapolPayload.key_mic)
 	print '   KEY DATA LENGTH = ' + str(socket.ntohs(struct.unpack('H',eapolPayload.key_data_length)[0]))
-	printEapolKeyData(eapolPayload.key_data)	
+	if socket.ntohs(struct.unpack('H',eapolPayload.key_data_length)[0]) != 0:
+		printEapolKeyData(eapolPayload.key_data)
+	else:
+		print '   KEY DATA = 0'
 
 
 def printEapolKeyInformationField(KeyInformationField):

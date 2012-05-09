@@ -11,6 +11,8 @@ from ether2_frame import EthernetIIFrame,EthernetIIHeader
 from exception import Error,packetKindNotManaged
 import my_debug
 import packet_printer
+import socket
+import struct
 
 
 class Splitter:
@@ -134,7 +136,14 @@ class Splitter:
 		#print '4.4'
 		#print (ord(descriptor_type))
 		#print key_information
-		key_data = self.get_eapol_key_data_field(eapol_payload_structure[95:])
+		#key_data
+		#print ' ' + str(socket.ntohs(struct.unpack('H',key_data_length)[0]))
+		if (socket.ntohs(struct.unpack('H',key_data_length)[0])) > 0:
+			#print 'c'
+			key_data = self.get_eapol_key_data_field(eapol_payload_structure[95:])
+		else: 
+			#print 'd'
+			key_data = 0
 		#print '4.5'
 		return EapolPayload(descriptor_type,key_information,key_length,key_replay_counter,key_nonce,eapol_key_iv,key_rsc,reserved,key_mic,key_data_length, key_data)
 
@@ -185,23 +194,24 @@ class Splitter:
 		
 		Il campo viene trattato come se fosse sempre nel formato KDE (perchè ai fini dell'elaborato, serve solo questo)
 		'''
-		print '6.1'
+		#print '6.1'
 		print ' ' + str(len(eapol_payload_structure))
 		typ = eapol_payload_structure[0:1]
 		length = eapol_payload_structure[1:2]
 		oui = eapol_payload_structure[2:5]
 		data_type = eapol_payload_structure[5:6]
 		
-		print '6.2'
-		if (data_type == 1): #GTK KDE
-			print '6.3.a'
+		#print '6.2'
+		print (ord(data_type))
+		if (ord(data_type) == 1): #GTK KDE
+			#print '6.3.a'
 			data = self.get_eapol_key_gtk_field(eapol_payload_structure[6:6+length-4],length)
-			print '6.4.a'
+			#print '6.4.a'
 		else:
-			print '6.3.b'
-			print ' ' + str(len(length))
+			#print '6.3.b'
+			#print ' ' + str(len(length))
 			data = eapol_payload_structure[6:(6+ord(length)-4)]
-			print '6.4.b'
+			#print '6.4.b'
 		
 		return KdeFormatKeyDataField(typ,length,oui,data_type,data)
 
