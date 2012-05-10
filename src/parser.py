@@ -195,14 +195,14 @@ class Splitter:
 		Il campo viene trattato come se fosse sempre nel formato KDE (perchè ai fini dell'elaborato, serve solo questo)
 		'''
 		#print '6.1'
-		print ' ' + str(len(eapol_payload_structure))
+		#print ' ' + str(len(eapol_payload_structure))
 		typ = eapol_payload_structure[0:1]
 		length = eapol_payload_structure[1:2]
 		oui = eapol_payload_structure[2:5]
 		data_type = eapol_payload_structure[5:6]
 		
 		#print '6.2'
-		print (ord(data_type))
+		#print (ord(data_type))
 		if (ord(data_type) == 1): #GTK KDE
 			#print '6.3.a'
 			data = self.get_eapol_key_gtk_field(eapol_payload_structure[6:6+length-4],length)
