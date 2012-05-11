@@ -47,5 +47,5 @@ except packetKindNotManaged:
 	print 'pacchetto non gestito'
 except noPacketRead:
 	print 'pacchetti finiti'
-except:
-	print 'errori non previsti'
+#except:
+#	print 'errori non previsti'

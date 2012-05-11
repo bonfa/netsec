@@ -125,7 +125,6 @@ class Splitter:
 		#print '4.3'
 		key_length = eapol_payload_structure[3:5]
 		key_replay_counter = eapol_payload_structure[5:13]
-		print '_________' + str((struct.unpack('q',key_replay_counter)[0]))
 		key_nonce = eapol_payload_structure[13:45]
 		eapol_key_iv = eapol_payload_structure[45:61]
 		key_rsc = eapol_payload_structure[61:69]

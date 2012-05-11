@@ -4,14 +4,12 @@
 """
 Stampa i pacchetti
 """
-from eapol_pack import EapolPacket,EapolHeader,EapolPayload,EapolKeyInformationField,EapolKeyDataField,KdeFormatKeyDataField,GtkFormatKeyDataField
-from ether2_frame import EthernetIIFrame,EthernetIIHeader
 import socket
 import struct
-import sys
 
 
 indent = '   '
+
 
 def macAddressToString(addressInBit):
 	return ':'.join('%02x' % ord(b) for b in addressInBit)
@@ -43,11 +41,11 @@ def printEapolPayload(eapolPayload):
 	print '   DESCRYPTOR TYPE = ' + str(ord(eapolPayload.descriptor_type))
 	printEapolKeyInformationField(eapolPayload.key_information)
 	print '   KEY LENGTH = ' + str(socket.ntohs(struct.unpack('H',eapolPayload.key_length)[0]))
-	print '   KEY REPLAY COUNTER = ' + str((struct.unpack('Q',eapolPayload.key_replay_counter)[0]))
+	print '   KEY REPLAY COUNTER = ' + str((struct.unpack('>Q',eapolPayload.key_replay_counter)[0]))
 	print '   KEY NONCE = ' + stringInHex(eapolPayload.key_nonce)
 	print '   EAPOL KEY IV = ' + stringInHex(eapolPayload.eapol_key_iv)
-	print '   KEY RSC = ' + str((struct.unpack('Q',eapolPayload.key_rsc)[0]))
-	print '   RESERVED = ' + str((struct.unpack('Q',eapolPayload.reserved)[0]))
+	print '   KEY RSC = ' + str((struct.unpack('>Q',eapolPayload.key_rsc)[0]))
+	print '   RESERVED = ' + str((struct.unpack('>Q',eapolPayload.reserved)[0]))
 	print '   KEY MIC = ' + stringInHex(eapolPayload.key_mic)
 	print '   KEY DATA LENGTH = ' + str(socket.ntohs(struct.unpack('H',eapolPayload.key_data_length)[0]))
 	if socket.ntohs(struct.unpack('H',eapolPayload.key_data_length)[0]) != 0:
@@ -90,6 +88,4 @@ def printEapolKeyData(keyDataField):
 	
 def printEapolKeyDataNoHeader(data):
 	print 2*indent + 'data = ' + stringInHex(data)
-
-
 
