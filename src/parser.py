@@ -6,11 +6,9 @@ Per il momento funziona solo per i pacchetti ethernet II e eapol.
 I dati vengono salvati così come sono, come insiemi di bit. Non vengono interpretati in interi o altro, (a parte i bit del campo key information del pacchetto eapol)
 """
 
-from eapol_pack import EapolPacket,EapolHeader,EapolPayload,EapolKeyInformationField,EapolKeyDataField,KdeFormatKeyDataField,GtkFormatKeyDataField
+from eapol_pack import EapolPacket,EapolHeader,EapolPayload,EapolKeyInformationField,KdeFormatKeyDataField,GtkFormatKeyDataField
 from ether2_frame import EthernetIIFrame,EthernetIIHeader
-from exception import Error,packetKindNotManaged
-import my_debug
-import packet_printer
+from exception import packetKindNotManaged
 import socket
 import struct
 
@@ -29,19 +27,21 @@ class Splitter:
 	
 	def __init__(self,frame):
 		'''
-		Il costruttore dal pacchetto separa il campo header e il payload e ritorna un oggetto che contiene i due attributi (header e payload) che a 			loro volta contengono tutte la variabili separate
+		Il costruttore dal pacchetto 
 		'''
-		#print '1.1'
-		header = self.get_ethernet_header(frame)
-		packet_printer.printEthernetHeader(header)
-		#print '1.2'
+		self.frame = frame
+
+	
+
+	def get_packet_splitted(self):
+		'''
+		Separa il campo header e il payload e ritorna un oggetto che contiene i due attributi (header e payload) che a loro volta contengono tutte la variabili separate in campi
+		'''
+		header = self.get_ethernet_header(self.frame)
 		# passo l'array a partire dal primo byte del payload così non devo sommare l'offset ogni volta
-		payload = self.get_ethernet_payload(frame[self.ethernet_offset:],header.ether_type)
-		#print '1.3'
-		self.ethernet_frame = EthernetIIFrame(frame,payload)
-		#self.numero = self.numero + 1
-		#print '---[' + str(self.numero) + ']---'
-		#print '1.4'
+		payload = self.get_ethernet_payload(self.frame[self.ethernet_offset:],header.ether_type)
+		ethernet_frame = EthernetIIFrame(header,payload)
+		return ethernet_frame
 
 
 	
@@ -80,7 +80,7 @@ class Splitter:
 			return payload
 		else:
 			#print '2.2'
-			raise packetKindNotManaged('The content of the payload is not managed by the software')
+			raise packetKindNotManaged('ether_type == self.EAPOL_TYPE','The content of the payload is not managed by the software')
 
 
 
@@ -92,10 +92,8 @@ class Splitter:
 		'''
 		#print '3.1'
 		header = self.get_eapol_header(eapol_structure)
-		packet_printer.printEapolHeader(header)
 		#print '3.2'
-		payload = self.get_eapol_payload(eapol_structure[4:],header.body_length)
-		packet_printer.printEapolPayload(payload)
+		payload = self.get_eapol_payload(eapol_structure[4:])
 		#print '3.3'
 		packet = EapolPacket(header,payload)
 		#print '3.4'
@@ -103,7 +101,7 @@ class Splitter:
 
 
 		
-	#@classmethod	
+	
 	def get_eapol_header(self,eapol_packet):
 		'''
 		Crea un oggetto di tipo eapol_header a partire dal pacchetto eapol
@@ -115,8 +113,8 @@ class Splitter:
 			
 
 
-	#@classmethod	
-	def get_eapol_payload(self,eapol_payload_structure,payload_length):
+	
+	def get_eapol_payload(self,eapol_payload_structure):
 		'''
 		Crea un oggetto di tipo eapol_payload a partire dal pacchetto eapol
 		'''
@@ -127,6 +125,7 @@ class Splitter:
 		#print '4.3'
 		key_length = eapol_payload_structure[3:5]
 		key_replay_counter = eapol_payload_structure[5:13]
+		print '_________' + str((struct.unpack('q',key_replay_counter)[0]))
 		key_nonce = eapol_payload_structure[13:45]
 		eapol_key_iv = eapol_payload_structure[45:61]
 		key_rsc = eapol_payload_structure[61:69]
@@ -149,7 +148,7 @@ class Splitter:
 
 
 
-	#@classmethod	
+	
 	def get_key_information(self,key_info_structure):
 		'''
 		Crea un oggetto di tipo key_information a partire dai due byte del pacchetto eapol che contengono questi campi
@@ -165,9 +164,7 @@ class Splitter:
 		   b0-1	      b2         b3          b4          b5 	     b6        b7        b8         b9       b10-11      b12        b13-15
 		'''
 		#print '5.1'
-		#my_debug.stampa_key_info_from_array(key_info_structure)
-		#my_debug.stampa_key_info_field_per_field(key_info_structure)
-
+	
 		key_descriptor_version = ord(key_info_structure[1:2]) & 0b00000111
 		key_type = (ord(key_info_structure[1:2]) & 0b00001000) >> 3
 		reserved = 0
@@ -195,21 +192,18 @@ class Splitter:
 		Il campo viene trattato come se fosse sempre nel formato KDE (perchè ai fini dell'elaborato, serve solo questo)
 		'''
 		#print '6.1'
-		#print ' ' + str(len(eapol_payload_structure))
 		typ = eapol_payload_structure[0:1]
 		length = eapol_payload_structure[1:2]
 		oui = eapol_payload_structure[2:5]
 		data_type = eapol_payload_structure[5:6]
 		
 		#print '6.2'
-		#print (ord(data_type))
 		if (ord(data_type) == 1): #GTK KDE
 			#print '6.3.a'
 			data = self.get_eapol_key_gtk_field(eapol_payload_structure[6:6+length-4],length)
 			#print '6.4.a'
 		else:
 			#print '6.3.b'
-			#print ' ' + str(len(length))
 			data = eapol_payload_structure[6:(6+ord(length)-4)]
 			#print '6.4.b'
 		
