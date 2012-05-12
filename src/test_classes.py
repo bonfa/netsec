@@ -13,7 +13,7 @@ from exception import Error,packetKindNotManaged,noPacketRead
 import packet_printer
 
 # test del parsing negli oggetti
-filename = '../pacchetti-catturati/cattura2'
+filename = '../pacchetti-catturati/cattura1'
 
 # creo l'oggetto che si interfaccia alla libpcap
 packet_list = pcap.pcapObject()

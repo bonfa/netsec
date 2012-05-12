@@ -27,3 +27,15 @@ class noPacketRead(Error):
 	def __init__(self, expr, msg):
 		self.expr = expr
 		self.msg = msg
+
+class pmkTooShortException(Error):
+	"""Exception raised when the pcap module doesn't find packet in input.
+
+	Attributes:
+		expr -- input expression in which the error occurred
+		msg  -- explanation of the error
+	"""
+	def __init__(self, expr, msg):
+		self.expr = expr
+		self.msg = msg
+

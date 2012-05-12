@@ -197,9 +197,9 @@ class Splitter:
 		data_type = eapol_payload_structure[5:6]
 		
 		#print '6.2'
-		if (ord(data_type) == 1): #GTK KDE
+		if ((oui == 0x00+0x0f+0xAC) and (ord(data_type) == 1)): #GTK KDE
 			#print '6.3.a'
-			data = self.get_eapol_key_gtk_field(eapol_payload_structure[6:6+length-4],length)
+			data = self.get_eapol_key_gtk_field(eapol_payload_structure[6:6+ord(length)-4],ord(length))
 			#print '6.4.a'
 		else:
 			#print '6.3.b'
@@ -217,9 +217,10 @@ class Splitter:
 		
 		Il campo viene trattato come se fosse sempre nel formato KDE (perchè ai fini dell'elaborato, serve solo questo)
 		'''
-		keyID = gtk_structure[0:1] & 3
-		tx = gtk_structure[0:1] & 4
-		reserved = gtk_structure[0:1] & 240 + gtk_structure[1:2]
+		#(ord(key_info_structure[1:2]) & 0b00001000) >> 3
+		keyID = ord(gtk_structure[0:1]) & 0b00000011 
+		tx = (ord(gtk_structure[0:1]) & 0b0000000100) >> 2
+		reserved = (ord(gtk_structure[0:1]) & 240) + ord(gtk_structure[1:2])
 		gtk = gtk_structure[2:length-6]
 		
 		return GtkFormatKeyDataField(keyID,tx,reserved,gtk)		

@@ -1,0 +1,12 @@
+manca tutto il discorso del groupkey exchange a partire dal parser
+
+STRANEZZE:
+1) il mio access point non cripta il messaggio 3 del 4way handshake (non rispetta il protocollo)
+2) wireshark non ha il campo SMK message tra i campi del key information --> probabilmente ignorato perchè non supportato dalla stazione o dal access point
+3) il campo keyRSC è sempre impostato a 0  --> (non rispetta il protocollo)
+
+
+VARIABILI:
+1) data --> contiene solo RSN information element nei pacchetti 2 e 3 del 4way handshake. Nel primo pacchetto del group key handshake è criptato
+
+

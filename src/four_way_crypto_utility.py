@@ -5,6 +5,7 @@ Questo modulo implementa i metodi di crittografia usati dal 4 way handshake
 '''
 
 import base_crypto_utility
+from exception import pmkTooShortException
 #"Pairwise key expansion"
 
 
@@ -22,8 +23,10 @@ class cryptographyManager:
 		I valori AA,SPA,ANonce,SNonce sono i campi fondamentali che costituiranno il messaggio di cui calcolare l'hash
 		Length è la lunghezza del risultato della prf
 		'''
-		if len(pmk) > 256:
+		if len(pmk) > 32:
 			self.pmk = self.curtailPmk(pmk,0,255)
+		elif len(pmk) < 32:
+			raise pmkTooShortException('len(pmk) < 256','pmk is too short')
 		else:
 			self.pmk = pmk
 		self.mex = mex
@@ -41,6 +44,17 @@ class cryptographyManager:
 		(minAddress,maxAddress,minNonce,maxNonce) = self.orderPadding()
 		variablePart = minAddress + maxAddress + minNonce + maxNonce
 		return base_crypto_utility.prf_512(self.pmk,self.mex,variablePart)
+
+
+	def getKeys(self):
+		'''
+		ottiene la prf, da essa estrae le tre chiavi KEK,KCK,TK e ritorna una tupla che contiene le tre chiavi nel seguente ordine [KEK,KCK,TK]
+		'''
+		prf = self.prf()
+		kek = base_crypto_utility.left(prf,0,8);
+		kck = base_crypto_utility.left(prf,8,8);
+		tk = base_crypto_utility.left(prf,16,16);
+		return [kek,kck,tk]
 		
 
 	def orderPadding(self):
