@@ -39,3 +39,17 @@ class pmkTooShortException(Error):
 		self.expr = expr
 		self.msg = msg
 
+
+class micKeyLenghtException(Error):
+	"""Exception raised when the lenght of the tkip mic is not 8 bytes
+
+	Attributes:
+		expr -- input expression in which the error occurred
+		msg  -- explanation of the error
+	"""
+	def __init__(self, expr, msg):
+		self.expr = expr
+		self.msg = msg
+
+
+
