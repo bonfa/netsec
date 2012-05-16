@@ -6,7 +6,7 @@ Contiene le utility necessarie a effettuare il MIC del 4 way handshake
 
 import struct
 from exception import micKeyLenghtException
-from base_operations import leftRotationOperation,rightRotationOperation
+from base_operations import leftRotationOperation,rightRotationOperation,NegativeShiftValueException
 
 class TkipMicGenerator:
 	'''
@@ -36,7 +36,6 @@ class TkipMicGenerator:
 		[l,r] = [k0,k1]
 		for i in range(0,N):
 			# estraggo 4 byte dal messaggio paddato
-			#print len(paddedMex[(4*i):(4*(i+1))])
 			Mi = struct.unpack('<I',paddedMex[(4*i):(4*(i+1))])[0]
 			# faccio lo xor
 			l = l ^ Mi
