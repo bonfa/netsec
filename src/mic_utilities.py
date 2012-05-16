@@ -6,7 +6,7 @@ Contiene le utility necessarie a effettuare il MIC del 4 way handshake
 
 import struct
 from exception import micKeyLenghtException
-
+from base_operations import leftRotationOperation,rightRotationOperation
 
 class TkipMicGenerator:
 	'''
@@ -30,18 +30,21 @@ class TkipMicGenerator:
 		# Paddo il messaggio
 		paddedMex = self.paddMex()
 		#Calcolo N
-		N = len(self.mex)
+		N = len(self.mex)/4
 
 		# Comincio l'algoritmo
 		[l,r] = [k0,k1]
-		for i in range(0,N-1):
+		for i in range(0,N):
 			# estraggo 4 byte dal messaggio paddato
-			Mi = paddedMex[(4*i):(4*(i+1))]
+			#print len(paddedMex[(4*i):(4*(i+1))])
+			Mi = struct.unpack('<I',paddedMex[(4*i):(4*(i+1))])[0]
 			# faccio lo xor
-			l = bool(l) ^ bool(Mi)
+			l = l ^ Mi
 			# ricalcolo l e r
 			[l,r] = self.b(l,r)
-		return [str(l) + str(r)]
+		#print len(l) + ' ' + len(r)
+		mic = struct.pack('<II',l,r)		
+		return mic
 
 
 	def paddMex(self):
@@ -70,15 +73,20 @@ class TkipMicGenerator:
 	@classmethod
 	def b(cls,l,r):
 		'''
-		effettua le operazioni della funzione b. Vedi pagina 171 della rfc
+		Effettua le operazioni della funzione b. 
+		Le operazioni effettuate sono le seguenti (pag 171 della rfc):
+		.) <<< = rotazione verso sinistra (non shift)
+		.) >>> = rotazione verso sinistra (non shift)
+		.) ^ = xor
+		.) a mod b: prendo i b bit di a, a partire da destra
 		'''
-		r = r ^ (l << 17)		# r = r ^ (l << 17)
-		l = (l + r) & 0xffffffffL	# l = (l+r) mod (2^32)  ---> prende i 32bit a destra
-		r = r ^ cls.xswap(l)		# r = r ^ cls.xswap(l)
+		r = r ^ leftRotationOperation(l,17)		# r = r ^ (l <<< 17)
+		l = (l + r) & 0xffffffffL			# l = (l+r) mod (2^32)  ---> prende i 32bit a destra
+		r = r ^ cls.xswap(l)				# r = r ^ cls.xswap(l)
 		l = (l + r) & 0xffffffffL
-		r = r ^ (l << 3)		# r = r ^ (l << 3)
+		r = r ^ leftRotationOperation(l,3)		# r = r ^ (l <<< 3)
 		l = (l + r) & 0xffffffffL
-		r = r ^ (l >> 2)		# r = r ^ (l >> 2)
+		r = r ^ rightRotationOperation(l,2)		# r = r ^ (l >>> 2)
 		l = (l + r) & 0xffffffffL
 		return (l,r)
 

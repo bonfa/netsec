@@ -49,7 +49,7 @@ class cryptographyManager:
 
 	def getKeys(self):
 		'''
-		ottiene la prf, da essa estrae le tre chiavi KEK,KCK,TK e ritorna una tupla che contiene le tre chiavi nel seguente ordine [KEK,KCK,TK]
+		ottiene la prf, da essa estrae le chiavi KEK,KCK,TK,micKey1,micKey2 e ritorna una tupla che contiene le tre chiavi nel seguente ordine [KEK,KCK,TK,micKey1,micKey2]
 		'''
 		prf = self.prf()
 		kek = base_crypto_utility.left(prf,0,16)
