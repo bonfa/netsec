@@ -3,13 +3,18 @@
 '''
 Calcolatore: little endian
 '''
+import sys
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src')
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/common_utility')
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/packetStruct')
+
 
 import pcap
-import sys
 from eapol_pack import EapolPacket,EapolHeader,EapolPayload,EapolKeyInformationField,EapolKeyDataField,KdeFormatKeyDataField,GtkFormatKeyDataField
 from ether2_frame import EthernetIIFrame,EthernetIIHeader
-from parser import Splitter
 from exception import Error,packetKindNotManaged,noPacketRead
+from parser import Splitter
 import packet_printer
 
 # test del parsing negli oggetti

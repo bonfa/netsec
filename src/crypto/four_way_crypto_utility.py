@@ -3,7 +3,11 @@
 '''
 Questo modulo implementa i metodi di crittografia usati dal 4 way handshake
 '''
-
+import sys
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/common_utility')
+#sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/packetStruct')
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src')
 import base_crypto_utility
 from exception import pmkTooShortException
 

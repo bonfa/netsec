@@ -3,7 +3,8 @@
 '''
 Testa le operazioni della clase base_operation
 '''
-
+import sys
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/common_utility')
 from base_operations import leftRotationOperation,rightRotationOperation,NegativeShiftValueException
 import unittest
 import struct
@@ -21,14 +22,15 @@ class TestBaseOperation(unittest.TestCase):
 		'''
 		self.a = 0b00000000111111111010101011111111
 
-##^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-
+##^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-+
+
 	def testRightRotationOperationWithNegativeShift(self):
 		'''
-		testo l'operazione di rotazione a destra di un valore zero
+		testo l'operazione di rotazione a destra di un valore negativo
 		'''
 		#r = rightRotationOperation(self.a,-1)
 		shiftValue = -2
-		self.assertRaises(NegativeShiftValueException,rightRotationOperation(self.a,shiftValue))
+		self.assertRaises(NegativeShiftValueException,rightRotationOperation,self.a,shiftValue)
 
 
 	def testRightRotationOperationWithoutRotation(self):
@@ -41,7 +43,7 @@ class TestBaseOperation(unittest.TestCase):
 
 	def testRightRotationOperationWithShift1(self):
 		'''
-		testo l'operazione di rotazione a destra di un valore diverso da zero (e minore di 32)
+		testo l'operazione di rotazione a destra di 1 bit
 		'''
 		r = rightRotationOperation(self.a,1)
 		result = 0b10000000011111111101010101111111	
@@ -59,7 +61,7 @@ class TestBaseOperation(unittest.TestCase):
 
 	def testRightRotationOperationWithShift31(self):
 		'''
-		testo l'operazione di rotazione a destra di un valore diverso da zero (e minore di 32)
+		testo l'operazione di rotazione a destra di 31 bit
 		'''
 		r = rightRotationOperation(self.a,31)
 		result = 0b00000001111111110101010111111110
@@ -76,7 +78,7 @@ class TestBaseOperation(unittest.TestCase):
 	
 	def testRightRotationOperationWithShift33(self):
 		'''
-		testo l'operazione di rotazione a destra di un valore uguale al numero di bits
+		testo l'operazione di rotazione a destra di 33 bit
 		'''
 		r = rightRotationOperation(self.a,33)
 		result = 0b10000000011111111101010101111111
@@ -85,13 +87,21 @@ class TestBaseOperation(unittest.TestCase):
 
 	def testRightRotationOperationWithShiftMajorThanBits(self):
 		'''
-		testo l'operazione di rotazione a destra di un valore diverso da zero (e minore di 32)
+		testo l'operazione di rotazione a destra di un valore maggiore di 32 bit
 		'''
 		r = rightRotationOperation(self.a,49)
 		result = 0b11010101011111111000000001111111
 		self.assertEqual(result,r)
 
 ##^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-^-
+	def testLeftRotationOperationWithNegativeShift(self):
+		'''
+		testo l'operazione di rotazione a sinistra di un valore negativo
+		'''
+		#r = rightRotationOperation(self.a,-1)
+		shiftValue = -2
+		self.assertRaises(NegativeShiftValueException,leftRotationOperation,self.a,shiftValue)
+
 
 	def testLeftRotationOperationWithoutRotation(self):
 		'''

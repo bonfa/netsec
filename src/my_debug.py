@@ -3,7 +3,11 @@
 """
 Contiene un po' di funzioni utili in fase di debug
 """
-
+import sys
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/common_utility')
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/packetStruct')
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src')
 from eapol_pack import EapolPacket,EapolHeader,EapolPayload,EapolKeyInformationField,EapolKeyDataField,KdeFormatKeyDataField,GtkFormatKeyDataField
 from ether2_frame import EthernetIIFrame,EthernetIIHeader
 from exception import Error,packetKindNotManaged

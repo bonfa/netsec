@@ -3,6 +3,11 @@
 '''
 Testo le funzioni di crittografia
 '''
+import sys
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/common_utility')
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/packetStruct')
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src')
 
 import pcap
 import sys

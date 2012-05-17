@@ -4,6 +4,11 @@
 Questo modulo implementa i metodi base di crittografia come le funzioni prf e L
 (pag 198 rfc)
 '''
+import sys
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/common_utility')
+#sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/packetStruct')
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src')
 #import hashlib
 import hmac
 
