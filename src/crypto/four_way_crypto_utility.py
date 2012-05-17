@@ -5,25 +5,25 @@ Questo modulo implementa i metodi di crittografia usati dal 4 way handshake
 '''
 import sys
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/common_utility')
-#sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/packetStruct')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src')
 import base_crypto_utility
-from exception import pmkTooShortException
+from exception import pmkTooShortException,MacNotSupportedException
+from hashlib import md5
+import hmac
 
-#"Pairwise key expansion"
 
 
-class cryptographyManager:
+class keyGenerator:
 	'''
-	Classe crpytographyManager
+	Classe keyGenerator
 
-	Contiene i metodi di crittografia chiamati durante le operazioni del 4 way handshake
+	Crea la chiave e la splitta nelle chiavi di sessione 
 	'''
 	
 	def __init__(self,pmk,mex,AA,SPA,ANonce,SNonce,length):
 		'''
-		Imposta i dati necessari al cryptographyManager:
+		Imposta i dati necessari al keyGenerator:
 		PMK è la chiave. Se la pmk è più lunga di 256 bit, viene troncata.
 		I valori AA,SPA,ANonce,SNonce sono i campi fondamentali che costituiranno il messaggio di cui calcolare l'hash
 		Length è la lunghezza del risultato della prf
@@ -84,8 +84,38 @@ class cryptographyManager:
 
 
 
+class cryptoManager:
+	'''
+	Classe cryptoManager
 
+	Contiene i metodi di crittografia chiamati durante le operazioni del 4 way handshake
+	'''
+	def __init__(self,packet,packetObject,kek,kck):
+		self.kek = kek
+		self.kck = kck
+		self.packet = packet
+		self.packetObject = packetObject
+	
 
-
+	def getMic(self):
+		'''
+		Ritorna il MIC del pacchetto eapol
+		'''
+		#prendo il pacchetto header
+		eapolpacket = self.packetObject.payload
+		if eapolpacket.payload.key_information.key_descriptor_version == 1:
+			# preparo il pacchetto con il campo MIC nullo
+			packetWithNullMICField = self.packet[0:95]
+			packetWithNullMICField = packetWithNullMICField + (chr(0x00),chr(0x00),chr(0x00),chr(0x00),chr(0x00),chr(0x00),chr(0x00),chr(0x00))
+			packetWithNullMICField = packetWithNullMICField + (chr(0x00),chr(0x00),chr(0x00),chr(0x00),chr(0x00),chr(0x00),chr(0x00),chr(0x00))
+			packetWithNullMICField = packetWithNullMICField + self.packet[95+16:]
+			# calcolo il digest e lo ritorno
+			digestMaker = hmac.new(self.kck)
+			digestMaker.update(str(packetWithNullMICField))
+			return digestMaker.hexdigest()
+			
+		else:
+			print ord(eapolpacket.payload.EapolKeyInformationField.key_descriptor_version)
+			raise MacNotSupportedException('eapolpacket.payload.descriptor_type == 1','Not supported mic type')
 
 

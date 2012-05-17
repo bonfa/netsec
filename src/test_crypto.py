@@ -15,7 +15,7 @@ from eapol_pack import EapolPacket,EapolHeader,EapolPayload,EapolKeyInformationF
 from ether2_frame import EthernetIIFrame,EthernetIIHeader
 from parser import Splitter
 from exception import packetKindNotManaged,noPacketRead,pmkTooShortException
-from four_way_crypto_utility import cryptographyManager
+from four_way_crypto_utility import keyGenerator,cryptoManager
 import packet_printer
 from mic_utilities import TkipMicGenerator
 #import base_crypto_utility
@@ -71,6 +71,7 @@ groupKeyHandshakeMsg_1 = getObjectPacket(groupKeyHandshakeMsg1Name)
 groupKeyHandshakeMsg_2 = getObjectPacket(groupKeyHandshakeMsg2Name)
 
 
+
 #printPacket(fourWayHandshakeMsg_1)
 #printPacket(fourWayHandshakeMsg_2)
 #printPacket(fourWayHandshakeMsg_3)
@@ -84,8 +85,8 @@ try:
 	SNonce = fourWayHandshakeMsg_1.payload.payload.key_nonce
 	AA = fourWayHandshakeMsg_1.header.source_address
 	SPA = fourWayHandshakeMsg_1.header.destination_address
-	manager = cryptographyManager(pwd,mex,AA,SPA,ANonce,SNonce,length)
-	[kek,kck,tk,micKey1,micKey2] = manager.getKeys()
+	keyGen = keyGenerator(pwd,mex,AA,SPA,ANonce,SNonce,length)
+	[kek,kck,tk,micKey1,micKey2] = keyGen.getKeys()
 	#stampo quelle che dovrebbero essere le chiavi di sessione
 	print packet_printer.stringInHex(kek) + '   L = ' + str(len(kek)*8) + '  bit'
 	print packet_printer.stringInHex(kck) + '   L = ' + str(len(kck)*8) + '  bit'
@@ -100,11 +101,19 @@ try:
 	(pktlen, data, timestamp) = packet
 		
 	# creo l'oggetto che si occupa di generare il MIC
-	micGenerator = TkipMicGenerator(data,micKey2)	
+	micGenerator = cryptoManager(packet,fourWayHandshakeMsg_2,kek,kck)	
+	#stampo il pacchetto
+	packetSplitter = Splitter(data)			
+	obj = packetSplitter.get_packet_splitted()
+	printPacket((obj))
 	# genero il MIC	
 	mic = micGenerator.getMic()
 	# stampo il MIC
-	print  'MIC = ' + packet_printer.stringInHex(mic)
+	print  'MIC = ' + mic
+	#micGenerator = TkipMicGenerator(data,micKey2)	
+
+	print len(kck)
+	print len(mic)
 
 
 except pmkTooShortException:
