@@ -27,7 +27,8 @@ class TestBaseOperation(unittest.TestCase):
 		testo l'operazione di rotazione a destra di un valore zero
 		'''
 		#r = rightRotationOperation(self.a,-1)
-		self.assertRaises(NegativeShiftValueException,rightRotationOperation(self.a,-1))
+		shiftValue = -2
+		self.assertRaises(NegativeShiftValueException,rightRotationOperation(self.a,shiftValue))
 
 
 	def testRightRotationOperationWithoutRotation(self):
