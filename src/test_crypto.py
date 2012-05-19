@@ -85,6 +85,9 @@ try:
 	SNonce = fourWayHandshakeMsg_1.payload.payload.key_nonce
 	AA = fourWayHandshakeMsg_1.header.source_address
 	SPA = fourWayHandshakeMsg_1.header.destination_address
+	print type(pwd)	
+	print type(AA)
+	print type(ANonce)			
 	keyGen = keyGenerator(pwd,mex,AA,SPA,ANonce,SNonce,length)
 	[kek,kck,tk,micKey1,micKey2] = keyGen.getKeys()
 	#stampo quelle che dovrebbero essere le chiavi di sessione
