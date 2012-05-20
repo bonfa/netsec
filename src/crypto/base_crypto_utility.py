@@ -9,6 +9,7 @@ sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/common_utility')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/packetStruct')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src')
 import hmac
+import hashlib
 
 '''
 La lunghezza dei campi è in byte e non in bit.
@@ -47,8 +48,8 @@ def hSha1(key,prefix,data,i):
 	'''
 	Effettua l'hmac-sha1 con chiave k del messaggio (prefix+data+i)
 	'''
-	message = prefix + str(0b00000000) + data + str(i)
-	m = hmac.new(key,message)
+	message = prefix + chr(0b00000000) + data + chr(i)
+	m = hmac.new(key,message,hashlib.sha1)
 	return m.digest()
 
 
