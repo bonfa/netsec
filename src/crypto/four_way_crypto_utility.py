@@ -21,7 +21,7 @@ class keyGenerator:
 	Crea la chiave e la splitta nelle chiavi di sessione 
 	'''
 	
-	def __init__(self,pmk,mex,AA,SPA,ANonce,SNonce,length):
+	def __init__(self,pmk,mex,AA,SPA,ANonce,SNonce):
 		'''
 		Imposta i dati necessari al keyGenerator:
 		PMK è la chiave. Se la pmk è più lunga di 256 bit, viene troncata.
@@ -39,7 +39,7 @@ class keyGenerator:
 		self.SPA = SPA
 		self.ANonce = ANonce
 		self.SNonce = SNonce
-		self.length = length
+		
 
 
 	def prf(self):
@@ -53,15 +53,15 @@ class keyGenerator:
 
 	def getKeys(self):
 		'''
-		ottiene la prf, da essa estrae le chiavi KEK,KCK,TK,micKey1,micKey2 e ritorna una tupla che contiene le tre chiavi nel seguente ordine [KEK,KCK,TK,micKey1,micKey2]
+		ottiene la prf, da essa estrae le chiavi KEK,KCK,TK,authenticatorMicKey,supplicantMicKey e ritorna una tupla che contiene le tre chiavi nel seguente ordine [KEK,KCK,TK,authenticatorMicKey,supplicantMicKey]
 		'''
 		prf = self.prf()
-		kek = base_crypto_utility.left(prf,0,16)
-		kck = base_crypto_utility.left(prf,16,16)
+		kck = base_crypto_utility.left(prf,0,16)
+		kek = base_crypto_utility.left(prf,16,16)
 		tk = base_crypto_utility.left(prf,32,32)
-		micKey1 = base_crypto_utility.left(prf,48,8)
-		micKey2 = base_crypto_utility.left(prf,56,8)
-		return [kek,kck,tk,micKey1,micKey2]
+		authenticatorMicKey = base_crypto_utility.left(prf,48,8)
+		supplicantMicKey = base_crypto_utility.left(prf,56,8)
+		return [kck,kek,tk,authenticatorMicKey,supplicantMicKey]
 		
 
 	def orderPadding(self):
@@ -81,6 +81,8 @@ class keyGenerator:
 		Se la pmk è troppo lunga, la seleziona tra start e start+end
 		'''
 		return base_crypto_utility.left(pmk,start,end)
+
+
 
 
 
