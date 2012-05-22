@@ -57,5 +57,10 @@ def left(data,F,L):
 	'''
 	Ritorna la parte sinistra di data, a partire da F fino a F+L-1
 	'''
+	if F<0:
+		raise ValueError('F can\'t be negative')
+	if F+L>len(data):
+		raise ValueError('F+L exceeds the vector dimension')
+	
 	return data[F:(F+L)]
 
