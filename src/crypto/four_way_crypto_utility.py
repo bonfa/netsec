@@ -84,6 +84,26 @@ class keyGenerator:
 
 
 
+class passphraseToPSKMap:
+	'''
+	Classe passphraseToPSKMap
+
+	Genera la psk a partire dall'ssid della rete e dalla passphrase di accesso per quella rete
+	'''
+	
+	def __init__(self,passphrase,ssid):
+		'''
+		Imposta i valori necessari alla generazione della psk
+		'''
+		self.passphrase = passphrase
+		self.ssid = ssid
+	
+	def getPsk():
+		'''
+		genera ritorna la psk generata a partire dalla passphrase
+		'''
+		psk = base_crypto_utility.pbkdf2(self.passphrase,self.ssid,len(self.ssid),4096,256)
+		return psk
 
 
 class cryptoManager:

@@ -61,6 +61,13 @@ def left(data,F,L):
 		raise ValueError('F can\'t be negative')
 	if F+L>len(data):
 		raise ValueError('F+L exceeds the vector dimension')
-	
 	return data[F:(F+L)]
 
+
+def pbkdf2(passphrase,ssid,ssidLen,c,dkLen):
+	'''
+	Mappa passphrase e ssid in una psk.
+	'''
+	l,r = divmod()	
+	
+	
