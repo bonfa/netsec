@@ -9,8 +9,8 @@ sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/packetStruct')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src')
 import base_crypto_utility
 from exception import pmkTooShortException,MacNotSupportedException
-from hashlib import md5
 import hmac
+import hashlib
 
 
 
@@ -103,21 +103,34 @@ class cryptoManager:
 		'''
 		Ritorna il MIC del pacchetto eapol
 		'''
-		#prendo il pacchetto header
+		# controllo che il desriptor sia corretto
 		eapolpacket = self.packetObject.payload
 		if eapolpacket.payload.key_information.key_descriptor_version == 1:
 			# preparo il pacchetto con il campo MIC nullo
-			packetWithNullMICField = self.packet[0:95]
-			packetWithNullMICField = packetWithNullMICField + (chr(0x00),chr(0x00),chr(0x00),chr(0x00),chr(0x00),chr(0x00),chr(0x00),chr(0x00))
-			packetWithNullMICField = packetWithNullMICField + (chr(0x00),chr(0x00),chr(0x00),chr(0x00),chr(0x00),chr(0x00),chr(0x00),chr(0x00))
-			packetWithNullMICField = packetWithNullMICField + self.packet[95+16:]
-			# calcolo il digest e lo ritorno
-			digestMaker = hmac.new(self.kck)
-			digestMaker.update(str(packetWithNullMICField))
-			return digestMaker.hexdigest()
-			
+			packetWithNullMICField = self.clearKeyMicField()
+			# tolgo l'header ethernet
+			eapolPacketWithNullMIC = self.getEapolPayload(packetWithNullMICField)		
+			# creo l'oggetto che crea il digest
+			digestMaker = hmac.new(self.kck,eapolPacketWithNullMIC,hashlib.md5)
+			# ritorno il digest			
+			return digestMaker.hexdigest()			
 		else:
-			print ord(eapolpacket.payload.EapolKeyInformationField.key_descriptor_version)
 			raise MacNotSupportedException('eapolpacket.payload.descriptor_type == 1','Not supported mic type')
 
 
+	def clearKeyMicField(self):
+		'''
+		Prende pacchetto e ne annulla il campo key mic
+		'''
+		packetWithNullMICField = self.packet[0:95]
+		packetWithNullMICField = packetWithNullMICField + (chr(0x00)+chr(0x00)+chr(0x00)+chr(0x00)+chr(0x00)+chr(0x00)+chr(0x00)+chr(0x00))
+		packetWithNullMICField = packetWithNullMICField + (chr(0x00)+chr(0x00)+chr(0x00)+chr(0x00)+chr(0x00)+chr(0x00)+chr(0x00)+chr(0x00))
+		packetWithNullMICField = packetWithNullMICField + self.packet[95+16:]
+		return packetWithNullMICField
+		
+	@classmethod
+	def getEapolPayload(self,packet):
+		'''
+		Dal pacchetto eapol toglie l'header ethernet e ritorna solo il pacchetto eapol		
+		'''
+		return packet[14:]
