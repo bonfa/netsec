@@ -8,7 +8,7 @@ sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/common_utility')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/packetStruct')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src')
 import base_crypto_utility
-from exception import pmkTooShortException,MacNotSupportedException
+from exception import pmkTooShortException,MacNotSupportedException,InputError
 import hmac
 import hashlib
 
@@ -95,6 +95,10 @@ class passphraseToPSKMap:
 		'''
 		Imposta i valori necessari alla generazione della psk
 		'''
+		if len(passphrase)< 8 || len(passphrase) > 63:
+			raise InputError(('len(passphrase)< 8 || len(passphrase) > 63','Error in passphrase length'))
+		if len(ssid)<0 || len(ssid)>32:
+			raise InputError(('len(ssid)<0 || len(ssid)>32','Error in ssid length'))
 		self.passphrase = passphrase
 		self.ssid = ssid
 	
@@ -102,7 +106,7 @@ class passphraseToPSKMap:
 		'''
 		genera ritorna la psk generata a partire dalla passphrase
 		'''
-		psk = base_crypto_utility.pbkdf2(self.passphrase,self.ssid,len(self.ssid),4096,256)
+		psk = base_crypto_utility.pbkdf2(self.passphrase,self.ssid,4096,256)
 		return psk
 
 

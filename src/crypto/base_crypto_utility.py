@@ -64,10 +64,17 @@ def left(data,F,L):
 	return data[F:(F+L)]
 
 
-def pbkdf2(passphrase,ssid,ssidLen,c,dkLen):
+def pbkdf2(passphrase,ssid,c,dkLen):
 	'''
 	Mappa passphrase e ssid in una psk.
 	'''
-	l,r = divmod()	
+	# Controlla che la codifica ASCII dei caratteri sia <126 e >32
+	for i in range(0,len(passphrase)):
+		if passphrase[i]<32 || passphrase[i]>126:
+			raise ValueError('Character ' + passphrase[i] + 'must be in range [32,126]')
+	
+	# Calcolo U1
+
+	# Calcolo gli altri Ui
 	
 	

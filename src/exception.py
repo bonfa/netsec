@@ -62,3 +62,14 @@ class MacNotSupportedException(Error):
 	def __init__(self, expr, msg):
 		self.expr = expr
 		self.msg = msg
+
+class InputError(Error):
+	"""Exception raised when the some input value doesn't respect some constraints
+
+	Attributes:
+		expr -- input expression in which the error occurred
+		msg  -- explanation of the error
+	"""
+	def __init__(self, expr, msg):
+		self.expr = expr
+		self.msg = msg
