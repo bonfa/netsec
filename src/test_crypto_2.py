@@ -15,13 +15,14 @@ from eapol_pack import EapolPacket,EapolHeader,EapolPayload,EapolKeyInformationF
 from ether2_frame import EthernetIIFrame,EthernetIIHeader
 from parser import Splitter
 from exception import packetKindNotManaged,noPacketRead,pmkTooShortException
-from four_way_crypto_utility import keyGenerator,cryptoManager
+from four_way_crypto_utility import keyGenerator,cryptoManager,passphraseToPSKMap
 import packet_printer
 
 
 
 '''Costanti'''
-#pmk = 'H6x&@!1uLQ*()!12c0x\\f^\'?|s<SNgh-'
+passphrase = 'H6x&@!1uLQ*()!12c0x\\f^\'?|s<SNgh-'
+ssid = 'WWWLAN'
 psk = "3f4eb9a38ba03f3a28235fd038971be12845a57169c2801d729afa6711f6db96".decode("hex")	
 path = '../pacchetti-catturati/'
 messaggioPerLaGenerazioneDiChiavi = "Pairwise key expansion"
@@ -97,10 +98,14 @@ AA = oggetto1Del4WayHandshake.header.source_address
 SPA = oggetto1Del4WayHandshake.header.destination_address
 
 
-# stampo i parametri
+# genero la psk a partire dalla passphrase
+pskGen = passphraseToPSKMap(passphrase,ssid)
+generatedPsk = pskGen.getPsk()
 
-# genero la chiave
-keyGen = keyGenerator(psk,messaggioPerLaGenerazioneDiChiavi,AA,SPA,ANonce,SNonce)
+print 'GENERATED PSK = ' + generatedPsk.encode("hex") + '   ' + str(len(generatedPsk))
+print 'CORRECT PSK = ' + psk.encode("hex") + '   ' + str(len(generatedPsk))
+# genero le chiavi
+keyGen = keyGenerator(generatedPsk,messaggioPerLaGenerazioneDiChiavi,AA,SPA,ANonce,SNonce)
 [kck,kek,tk,authenticatorMicKey,supplicantMicKey] = keyGen.getKeys()
 
 # prendo il secondo pacchetto e ne calcolo il MIC

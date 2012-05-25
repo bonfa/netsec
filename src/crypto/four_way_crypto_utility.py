@@ -95,18 +95,19 @@ class passphraseToPSKMap:
 		'''
 		Imposta i valori necessari alla generazione della psk
 		'''
-		if len(passphrase)< 8 || len(passphrase) > 63:
+		if len(passphrase)< 8 or len(passphrase) > 63:
 			raise InputError(('len(passphrase)< 8 || len(passphrase) > 63','Error in passphrase length'))
-		if len(ssid)<0 || len(ssid)>32:
+		if len(ssid)<0 or len(ssid)>32:
 			raise InputError(('len(ssid)<0 || len(ssid)>32','Error in ssid length'))
 		self.passphrase = passphrase
 		self.ssid = ssid
 	
-	def getPsk():
+
+	def getPsk(self):
 		'''
 		genera ritorna la psk generata a partire dalla passphrase
 		'''
-		psk = base_crypto_utility.pbkdf2(self.passphrase,self.ssid,4096,256)
+		psk = base_crypto_utility.pbkdf2(self.passphrase,self.ssid,4096)
 		return psk
 
 

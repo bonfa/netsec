@@ -10,6 +10,9 @@ sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/packetStruct')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src')
 import hmac
 import hashlib
+import struct
+import array
+from math import ceil
 
 '''
 La lunghezza dei campi è in byte e non in bit.
@@ -64,17 +67,63 @@ def left(data,F,L):
 	return data[F:(F+L)]
 
 
-def pbkdf2(passphrase,ssid,c,dkLen):
+
+def pbkdf2(passphrase,ssid,c,dkLen=32):
 	'''
-	Mappa passphrase e ssid in una psk.
+	Mappa passphrase e ssid di una wlan in una psk.
+	Funziona solo per dkLen = 32
+	'''
+	hLen = 20
+	numBlocks = ceil(float(dkLen)/float(hLen))
+	r = dkLen - (numBlocks - 1)*hLen
+	psk = ''
+	for i in range(1,int(numBlocks)+1):
+		psk += f(passphrase,ssid,c,i)
+	return psk[0:dkLen]	
+
+		
+def f(passphrase,salt,c,it):
+	'''
+	funzione di base per la pbkdf2
 	'''
 	# Controlla che la codifica ASCII dei caratteri sia <126 e >32
 	for i in range(0,len(passphrase)):
-		if passphrase[i]<32 || passphrase[i]>126:
-			raise ValueError('Character ' + passphrase[i] + 'must be in range [32,126]')
+		if ord(passphrase[i])<32 or ord(passphrase[i])>126:
+			raise ValueError('Character \'' + passphrase[i] +'[' + ord(passphrase[i])+']'+ '\' must be in range [32,126]')
 	
 	# Calcolo U1
+	## trasformo il counter in unsigned integer a 32 bit big endian
+	counterStr = struct.pack('>L',int(it));
+	# creo la stringa di cui si calcola la prf
+	inputString = salt + counterStr
+	#print inputString.encode('hex')
+	# calcolo la prf
+	digestMaker = hmac.new(passphrase,inputString,hashlib.sha1)
+	Ui = digestMaker.digest()
+	output = Ui
 
 	# Calcolo gli altri Ui
+	for i in range(1,c):
+		# Ui = prf(passphrase,Ui-1)
+		digestMaker = hmac.new(passphrase,Ui,hashlib.sha1)
+		Ui = digestMaker.digest()
+		# output = output ^ Ui
+		output = strXor(output,Ui) 
+	# ritorno il risultato degli xor
+	return output
+
+
+
+def strXor(str1,str2):
+	'''
+	effettua lo xor tra due stringhe della stessa lunghezza
+	'''
+	if len(str1) != len(str2):
+		raise ValueError('str1 and str2 must be of the same length')
+	arr1 = array.array('B',str1)
+	arr2 = array.array('B',str2)
 	
-	
+	for i in range(len(arr1)):
+		arr1[i] = arr1[i] ^ arr2[i]
+	#arr1.reverse()
+	return arr1.tostring()
