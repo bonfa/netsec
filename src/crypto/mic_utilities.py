@@ -11,6 +11,8 @@ import struct
 from exception import micKeyLenghtException
 from base_operations import leftRotationOperation,rightRotationOperation,NegativeShiftValueException
 
+
+
 class TkipMicGenerator:
 	'''
 	Classe TkipMicGenerator
