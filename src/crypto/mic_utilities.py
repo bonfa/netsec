@@ -5,7 +5,6 @@ Contiene le utility necessarie a effettuare il MIC del 4 way handshake
 '''
 import sys
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/common_utility')
-#sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/packetStruct')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src')
 import struct
@@ -34,7 +33,7 @@ class TkipMicGenerator:
 		# Paddo il messaggio
 		paddedMex = self.paddMex()
 		#Calcolo N
-		N = len(self.mex)/4
+		N = len(paddedMex)/4
 
 		# Comincio l'algoritmo
 		[l,r] = [k0,k1]
@@ -68,7 +67,7 @@ class TkipMicGenerator:
 		'''
 		#print str(len(self.key))
 		if (len(self.key) != self.keyLenght):
-			raise micKeyLenghtException('len(key) != self.keyLenght','La lunghezza della chiave dev\'essere di 8 byte')
+			raise micKeyLenghtException('len(key) != self.keyLenght',"La lunghezza della chiave dev'essere di 8 byte")
 		k0,k1 = struct.unpack('<II', self.key)
 		return (k0,k1)
 
@@ -97,14 +96,12 @@ class TkipMicGenerator:
 	@classmethod
 	def xswap(cls,data):
 		'''
-		effettua lo swap dei due byte meno significativi del dato (big endian)
+		effettua lo swap dei due byte meno significativi e dei due byte più significativi del dato (little endian)
+		xswap(ABCD) = BADC
 		'''
-		# data è un intero positivo di 32bit big endian
-		# devo swappare i due byte meno significativi che sono i due byte a sinistra
-		# prendo il primo e il secondo byte della 
-		primoByte = (data & 0xff000000)
-		secondoByte = (data & 0x00ff0000)
-		terzoEQuartoByte = (data & 0x0000ffff)
-		swapped = (primoByte >> 8) + (secondoByte << 8) + terzoEQuartoByte
+		# data è un intero positivo di 32bit little endian		
+		primoTerzoByte = (data & 0xff00ff00)
+		secondoQuartoByte = (data & 0x00ff00ff)
+		swapped = (primoTerzoByte >> 8) | (secondoQuartoByte << 8)
 		return swapped
 
