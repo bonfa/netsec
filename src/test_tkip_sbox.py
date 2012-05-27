@@ -16,28 +16,6 @@ class SBoxOperation(unittest.TestCase):
 	'''
 
 
-	def test_low8(self):
-		'''
-		testo l'operazione low8
-		'''
-		a = 0xaabb
-		processed = tkip_sboxes.low8(a)
-		expected = 0xbb
-		self.assertEqual(expected,processed) 
-
-	
-
-	def test_high8(self):
-		'''
-		testo l'operazione high8
-		'''
-		a = 0xaabb
-		processed = tkip_sboxes.high8(a)
-		expected = 0xaa
-		self.assertEqual(expected,processed) 
-
-
-
 	def test_getValueFromSbox_1(self):
 		'''
 		testo l'operazione getValueFromSbox

@@ -40,6 +40,33 @@ def rightRotationOperation(value,shift,bits=32):
 	return (value >> shift) | (maskBits << (bits - shift))
 
 
+
+def low8(num):
+	'''
+	ritorna il byte meno significativo di num
+	'''
+	return num & 0xff
+
+
+
+def high8(num):
+	'''
+	ritorna num senza il byte meno significativo
+	'''
+	return num >> 8
+
+
+
+
+def mk16(x,y):
+		'''
+		Prende due valori a 8 bit e ne ritorna uno a 16 bit
+		x diventa il byte più significativo nel valore a 16 bit
+		'''
+		sixteenBitValue =  ((x << 8) + y) & 0xffff
+		return sixteenBitValue
+
+
 	
 class NegativeShiftValueException(Exception):
 	"""Eccezione chiamata quando il valore dello shift passato come parametro nelle operazioni di rotazione è negativo

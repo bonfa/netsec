@@ -5,7 +5,7 @@ Testa le operazioni della clase base_operation
 '''
 import sys
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/common_utility')
-from base_operations import leftRotationOperation,rightRotationOperation,NegativeShiftValueException
+from base_operations import leftRotationOperation,rightRotationOperation,NegativeShiftValueException,high8,low8,mk16
 import unittest
 import struct
 
@@ -162,6 +162,63 @@ class TestBaseOperation(unittest.TestCase):
 		l = leftRotationOperation(self.a,49)
 		result = 0b01010101111111100000000111111111
 		self.assertEqual(result,l)
+
+
+
+	def test_low8(self):
+		'''
+		testo l'operazione low8
+		'''
+		a = 0xaabb
+		processed = low8(a)
+		expected = 0xbb
+		self.assertEqual(expected,processed) 
+
+	
+
+	def test_high8(self):
+		'''
+		testo l'operazione high8
+		'''
+		a = 0xaabb
+		processed = high8(a)
+		expected = 0xaa
+		self.assertEqual(expected,processed)
+
+
+	def test_mk16_1(self):
+		'''
+		testo la funzione mk16 per due valori
+		'''
+		a = 0
+		b = 0
+		processedResult = mk16(a,b)
+		expectedResult = 0
+		self.assertEqual(processedResult,expectedResult) 
+
+
+
+	def test_mk16_2(self):
+		'''
+		testo la funzione mk16 per due valori
+		'''
+		a = 0xaa
+		b = 0x00
+		processedResult = mk16(a,b)
+		expectedResult = 0xaa00
+		self.assertEqual(processedResult,expectedResult)
+
+
+
+	def test_mk16_3(self):
+		'''
+		testo la funzione mk16 per due valori
+		'''
+		a = 0x1f
+		b = 0x02
+		processedResult = mk16(a,b)
+		expectedResult = 0x1f02
+		self.assertEqual(processedResult,expectedResult) 
 
 
 

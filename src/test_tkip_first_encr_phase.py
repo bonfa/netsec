@@ -5,7 +5,7 @@ Testa le operazioni del modulo tkip_encryption
 '''
 import sys
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
-from tkip_encryption import TKIPphaseOne
+from tkip_encryption import TKIPphaseOne,TKIPvariableSplitter
 import unittest
 import struct
 
@@ -17,42 +17,6 @@ class TestTkipEncryptionPhaseOne(unittest.TestCase):
 	'''
 
 
-	def test_mk16_1(self):
-		'''
-		testo la funzione mk16 per due valori
-		'''
-		a = 0
-		b = 0
-		processedResult = TKIPphaseOne.mk16(a,b)
-		expectedResult = 0
-		self.assertEqual(processedResult,expectedResult) 
-
-
-
-	def test_mk16_2(self):
-		'''
-		testo la funzione mk16 per due valori
-		'''
-		a = 0xaa
-		b = 0x00
-		processedResult = TKIPphaseOne.mk16(a,b)
-		expectedResult = 0xaa00
-		self.assertEqual(processedResult,expectedResult)
-
-
-
-	def test_mk16_3(self):
-		'''
-		testo la funzione mk16 per due valori
-		'''
-		a = 0x1f
-		b = 0x02
-		processedResult = TKIPphaseOne.mk16(a,b)
-		expectedResult = 0x1f02
-		self.assertEqual(processedResult,expectedResult) 
-
-
-
 	def test_getSplittedTA(self):
 		'''
 		testo la funzione che separa il TA
@@ -60,8 +24,8 @@ class TestTkipEncryptionPhaseOne(unittest.TestCase):
 		tk = 0
 		ta = struct.pack('6B',0xaa,0xbb,0xcc,0xdd,0xee,0xff)
 		tsc = 0
-		encrPh1 = TKIPphaseOne(tk,ta,tsc)
-		processedResult = encrPh1.getSplittedTA()
+		variableSplitter = TKIPvariableSplitter(tk,ta,tsc)
+		processedResult = variableSplitter.getSplittedTA()
 		expectedResult = (0xaa,0xbb,0xcc,0xdd,0xee,0xff)
 		self.assertEqual(processedResult,expectedResult) 
 
@@ -74,8 +38,8 @@ class TestTkipEncryptionPhaseOne(unittest.TestCase):
 		tk = struct.pack('16B',0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xaa,0xbb,0xcc,0xdd,0xee,0xff)
 		ta = 0
 		tsc = 0
-		encrPh1 = TKIPphaseOne(tk,ta,tsc)
-		processedResult = encrPh1.getSplittedTK()
+		variableSplitter = TKIPvariableSplitter(tk,ta,tsc)
+		processedResult = variableSplitter.getSplittedTK()
 		expectedResult = (0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xaa,0xbb,0xcc,0xdd,0xee,0xff)
 		self.assertEqual(processedResult,expectedResult) 
 
@@ -88,8 +52,8 @@ class TestTkipEncryptionPhaseOne(unittest.TestCase):
 		tk = 0
 		ta = 0
 		tsc = struct.pack('6B',0x00,0x11,0x22,0x33,0x44,0x55)
-		encrPh1 = TKIPphaseOne(tk,ta,tsc)
-		processedResult = encrPh1.getSplittedTSC()
+		variableSplitter = TKIPvariableSplitter(tk,ta,tsc)
+		processedResult = variableSplitter.getSplittedTSC()
 		expectedResult = (0x00,0x11,0x22,0x33,0x44,0x55)
 		self.assertEqual(processedResult,expectedResult) 
 
