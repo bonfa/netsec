@@ -31,7 +31,8 @@ class TKIPphaseOne:
 		'''
 		# prendo i valori di input separati in byte
 		ta0,ta1,ta2,ta3,ta4,ta5 = self.getSplittedTA()
-		tk0,tk1,tk2,tk3,tk4,tk5,tk6,tk7,tk8,tk9,tk10,tk11,tk12,tk13,tk14,tk15 = self.getSplittedTK() 
+		tk0,tk1,tk2,tk3,tk4,tk5,tk6,tk7,tk8,tk9,tk10,tk11,tk12,tk13,tk14,tk15 = self.getSplittedTK()
+		tk_tuple = (tk0,tk1,tk2,tk3,tk4,tk5,tk6,tk7,tk8,tk9,tk10,tk11,tk12,tk13,tk14,tk15)
 		tsc0,tsc1,tsc2,tsc3,tsc4,tsc5 = self.getSplittedTSC()
 		'''step_1'''
 		# inizializzo i ttak
@@ -43,13 +44,15 @@ class TKIPphaseOne:
 		'''step_2'''
 		# mescolo i ttak
 		for i in range(8):
-			j = 2*(i & 1) & 0xffff
+			j = 2*(i & 1)
 			# tutte le operazioni devono essere eseguite in modulo 2^16 per non andare out of bound
-			ttak0 = (ttak0 + S(ttak4 ^ self.mk16(tk0+j,tk1+j))) & 0xffff
-			ttak1 = (ttak1 + S(ttak0 ^ self.mk16(tk5+j,tk4+j))) & 0xffff
-			ttak2 = (ttak2 + S(ttak1 ^ self.mk16(tk9+j,tk8+j))) & 0xffff
-			ttak3 = (ttak3 + S(ttak2 ^ self.mk16(tk13+j,tk12+j))) & 0xffff
-			ttak4 = (ttak4 + S(ttak3 ^ self.mk16(tk1+j,tk0+j)) + i) & 0xffff
+			
+			ttak0 = (ttak0 + S(ttak4 ^ self.mk16(tk_tuple[1+j],tk_tuple[0+j]))) & 0xffff
+			ttak1 = (ttak1 + S(ttak0 ^ self.mk16(tk_tuple[5+j],tk_tuple[4+j]))) & 0xffff
+			ttak2 = (ttak2 + S(ttak1 ^ self.mk16(tk_tuple[9+j],tk_tuple[8+j]))) & 0xffff
+			ttak3 = (ttak3 + S(ttak2 ^ self.mk16(tk_tuple[13+j],tk_tuple[12+j]))) & 0xffff
+			ttak4 = (ttak4 + S(ttak3 ^ self.mk16(tk_tuple[1+j],tk_tuple[0+j]))) & 0xffff
+			ttak4 = (ttak4 + i) & 0xffff
 		# ritorno la tupla contenente i ttak
 		return ttak0,ttak1,ttak2,ttak3,ttak4
 
@@ -117,4 +120,25 @@ class TKIPphaseOne:
 		return sixteenBitValue
 
 
+
+
+
+class TKIPphaseTwo:
+	'''
+	Classe TKIPphaseTwo
+
+	Effettua la fase 2 della mixing function utilizzata durante la crittografia del tkip
+	'''
+	def __init__(self,ttak,tk,tsc):
+		self.ttak = ttak
+		self.tk = tk
+		self.tsc = tsc	
+
+
 	
+	def getWEPSeed(self):
+		'''
+		calcola il WEPSeed da ttak,tk e tsc. L'algoritmo è descritto a pagina 178 della rfc
+		'''
+		
+
