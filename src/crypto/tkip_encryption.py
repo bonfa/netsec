@@ -12,6 +12,30 @@ from tkip_sboxes import S
 from base_operations import rightRotationOperation,low8,high8,mk16
 
 
+
+class TKIPmixingFunction:
+	'''
+	Classe TKIPmixingFunction
+
+	Implementazione della mixing function usata dal tkip per criptare
+	'''
+	def __init__(self,tk,ta,tsc):
+		self.tk = tk
+		self.ta = ta
+		self.tsc = tsc
+		self.ttak = 0
+
+	def getWepSeed(self):
+		'''
+		Ritorna il wep seed, risultato dell'elaborazione del tkip
+		'''
+		mixingFunctionPart1 = TKIPphaseOne(self.tk,self.ta,self.tsc)
+		self.ttak = mixingFunctionPart1.getTTAK()
+		mixingFunctionPart2 = TKIPphaseTwo(self.ttak,self.tk,self.tsc) 	
+		return mixingFunctionPart2.getWEPSeed()
+
+
+
 class TKIPphaseOne:
 	'''
 	Classe TKIPphaseOne
@@ -69,7 +93,7 @@ class TKIPphaseTwo:
 		self.ttak = ttak
 		self.tk = tk
 		self.tsc = tsc	
-		attributeSplitter = TKIPvariableSplitter(tk,0,tsc)
+		self.attributeSplitter = TKIPvariableSplitter(tk,0,tsc)
 
 	
 	def getWEPSeed(self):
@@ -82,12 +106,12 @@ class TKIPphaseTwo:
 		tsc0,tsc1,tsc2,tsc3,tsc4,tsc5 = self.attributeSplitter.getSplittedTSC()
 		# ttak è già una tupla e quindi non dev'essere splittato
 		'''step_1'''
-		ppk0 = ttak0
-		ppk1 = ttak1
-		ppk2 = ttak2
-		ppk3 = ttak3
-		ppk4 = ttak4
-		ppk5 = (ttak4 + mk16(tsc0,tsc1)) & 0xffff
+		ppk0 = self.ttak[0]
+		ppk1 = self.ttak[1]
+		ppk2 = self.ttak[2]
+		ppk3 = self.ttak[3]
+		ppk4 = self.ttak[4]
+		ppk5 = (self.ttak[4] + mk16(tsc1,tsc0)) & 0xffff
 		
 		'''step_2'''
 		ppk0 = (ppk0 + S(ppk5 ^ mk16(tk1,tk0))) & 0xffff
@@ -97,27 +121,31 @@ class TKIPphaseTwo:
 		ppk4 = (ppk4 + S(ppk3 ^ mk16(tk9,tk8))) & 0xffff
 		ppk5 = (ppk5 + S(ppk4 ^ mk16(tk11,tk10))) & 0xffff
 	
-		ppk0 = (ppk0 + rotR1(ppk5 ^ mk16(tk13,tk12))) & 0xffff
-		ppk1 = (ppk1 + rotR1(ppk0 ^ mk16(tk15,tk14))) & 0xffff
-		ppk2 = (ppk2 + rotR1(ppk1)) & 0xffff
-		ppk3 = (ppk3 + rotR1(ppk2)) & 0xffff
-		ppk4 = (ppk4 + rotR1(ppk3)) & 0xffff
-		ppk5 = (ppk5 + rotR1(ppk4)) & 0xffff
-	
+		ppk0 = (ppk0 + self.rotR1(ppk5 ^ mk16(tk13,tk12))) & 0xffff
+		ppk1 = (ppk1 + self.rotR1(ppk0 ^ mk16(tk15,tk14))) & 0xffff
+		ppk2 = (ppk2 + self.rotR1(ppk1)) & 0xffff
+		ppk3 = (ppk3 + self.rotR1(ppk2)) & 0xffff
+		ppk4 = (ppk4 + self.rotR1(ppk3)) & 0xffff
+		ppk5 = (ppk5 + self.rotR1(ppk4)) & 0xffff
+			
+		ppk_tuple = (ppk0,ppk1,ppk2,ppk3,ppk4,ppk5)
 		'''step3'''
-		'''wepSeed0 = tsc1
-		wepSeed1 = (tsc1 | 0x20) & 0x7F
-		wepSeed2 = tsc0
-		wepSeed3 = low8()
-		for i in range(5):
-			wepSeed4 = low8()
-			wepSeed5 = high8()
+		wepSeed=[]
+		wepSeed.append(tsc1)
+		wepSeed.append((tsc1 | 0x20) & 0x7F)
+		wepSeed.append(tsc0)
+		wepSeed.append(low8((ppk5 ^ mk16(tk1,tk0))>>1))
+		
+		#wepSeed_tuple = (wepSeed0,wepSeed1,wepSeed2,wepSeed3,wepSeed4,wepSeed5)
+		for i in range(6):
+			wepSeed.append(low8(ppk_tuple[i]))
+			wepSeed.append(high8(ppk_tuple[i]))
 	
-		return wepSeed0
-		'''
+		return tuple(wepSeed)
+		
 
 	@classmethod
-	def rotR1(self,value):
+	def rotR1(cls,value):
 		'''
 		Effettua la rotazione a destra di un bit del valore passato come parametro
 		'''
