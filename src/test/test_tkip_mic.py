@@ -5,7 +5,7 @@ Testa le operazioni del modulo mic_utilities
 '''
 import sys
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
-from mic_utilities import TkipMicGenerator
+from four_way_mic_utility import TkipMicGenerator
 import unittest
 import struct
 
