@@ -4,6 +4,7 @@
 Testo le funzioni di crittografia
 '''
 import sys
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/utilities')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/common_utility')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/packetStruct')
@@ -13,7 +14,7 @@ import pcap
 import sys
 from eapol_pack import EapolPacket,EapolHeader,EapolPayload,EapolKeyInformationField,EapolKeyDataField,KdeFormatKeyDataField,GtkFormatKeyDataField
 from ether2_frame import EthernetIIFrame,EthernetIIHeader
-from parser import Splitter
+from packet_parser import Splitter
 from exception import packetKindNotManaged,noPacketRead,pmkTooShortException
 from four_way_crypto_utility import keyGenerator,cryptoManager
 import packet_printer

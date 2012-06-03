@@ -4,16 +4,17 @@
 
 '''
 import sys
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/utilities')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/common_utility')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/packetStruct')
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src')
+
 
 import pcap
 import sys
 from eapol_pack import EapolPacket,EapolHeader,EapolPayload,EapolKeyInformationField,EapolKeyDataField,KdeFormatKeyDataField,GtkFormatKeyDataField
 from ether2_frame import EthernetIIFrame,EthernetIIHeader
-from parser import Splitter
+from packet_parser import Splitter
 from exception import packetKindNotManaged,noPacketRead,pmkTooShortException
 from four_way_crypto_utility import keyGenerator,cryptoManager,passphraseToPSKMap
 import packet_printer
@@ -24,7 +25,7 @@ import packet_printer
 passphrase = 'H6x&@!1uLQ*()!12c0x\\f^\'?|s<SNgh-'
 ssid = 'WWWLAN'
 #psk = "3f4eb9a38ba03f3a28235fd038971be12845a57169c2801d729afa6711f6db96".decode("hex")	
-path = '../pacchetti-catturati/'
+path = '../../pacchetti-catturati/'
 messaggioPerLaGenerazioneDiChiavi = "Pairwise key expansion"
 NomeDelPacchetto1DelFourWayHandshake = path + 'four_way_1'
 NomeDelPacchetto2DelFourWayHandshake = path + 'four_way_2'
@@ -111,6 +112,12 @@ keyGen = keyGenerator(psk,messaggioPerLaGenerazioneDiChiavi,AA,SPA,ANonce,SNonce
 micGen = cryptoManager(pacchetto2DelFourWayHandshake,oggetto2Del4WayHandshake,kek,kck)
 # ottengo il mic
 mic = micGen.getMic()
+
+#stampo il pacchetto
+packet_printer.printEthernetHeader(oggetto2Del4WayHandshake.header)
+packet_printer.printEapolHeader(oggetto2Del4WayHandshake.payload.header)
+packet_printer.printEapolPayload(oggetto2Del4WayHandshake.payload.payload)
+print '\n\n\n'
 #stampo il mic
 print 'MIC = ' + mic
 

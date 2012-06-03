@@ -1,7 +1,7 @@
 #/usr/bin/python
 # -*- coding: utf-8 -*-
 '''
-Testa le operazioni del modulo tkip_encryptio
+Testa le operazioni del modulo tkip_encryption
 OSS: in tutti i test il tsc è definito con i byte inversi rispetto al test vector
 '''
 import sys
@@ -14,7 +14,8 @@ import struct
 
 class TestTkipEncryptionMixingFunction(unittest.TestCase):
 	'''
-	Casi di test per le operazioni definite nella classe TKIPphaseOne
+	Casi di test per la mixing function del tkip
+	Le operazioni testate sono definite nelle classi TKIPphaseOne,TKIPphaseTwo,TKIPmixingFunction e TKIPvariableSplitter
 	'''
 
 

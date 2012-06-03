@@ -6,7 +6,7 @@ Per il momento funziona solo per i pacchetti ethernet II e eapol.
 I dati vengono salvati così come sono, come insiemi di bit. Non vengono interpretati in interi o altro, (a parte i bit del campo key information del pacchetto eapol)
 """
 import sys
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/')
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/utilities')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/packetStruct')
 
 from eapol_pack import EapolPacket,EapolHeader,EapolPayload,EapolKeyInformationField,KdeFormatKeyDataField,GtkFormatKeyDataField

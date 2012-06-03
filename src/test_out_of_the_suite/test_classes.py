@@ -8,17 +8,18 @@ sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/common_utility')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/packetStruct')
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/utilities')
 
 
 import pcap
 from eapol_pack import EapolPacket,EapolHeader,EapolPayload,EapolKeyInformationField,EapolKeyDataField,KdeFormatKeyDataField,GtkFormatKeyDataField
 from ether2_frame import EthernetIIFrame,EthernetIIHeader
 from exception import Error,packetKindNotManaged,noPacketRead
-from parser import Splitter
 import packet_printer
+from packet_parser import Splitter
 
 # test del parsing negli oggetti
-filename = '../pacchetti-catturati/cattura1'
+filename = '../../pacchetti-catturati/cattura1'
 
 # creo l'oggetto che si interfaccia alla libpcap
 packet_list = pcap.pcapObject()
