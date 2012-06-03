@@ -23,7 +23,10 @@ class arcFour:
 		#	raise ValueError('Key must be 40 or 128 bit long')
 		self.key = key
 		self.input = None
+		self.i = None
+		self.j = None
 		self.SBox = self.setSBox()
+
 
 	
 
@@ -39,6 +42,9 @@ class arcFour:
 		'''
 		Genera le SBox a partire dalla chiave
 		'''
+		## Inizializzo i e j		
+		self.i = 0
+		self.j = 0
 		## Inizializzo l'S-box
 		S = range(256)
 		
@@ -64,18 +70,15 @@ class arcFour:
 		'''
 		Genera il KeyStream
 		'''
-		i = 0
-		j = 0
-
-		i = (i+1) % 256
-		j = (j+ self.S[i]) % 256
-		temp = self.S[i]
-		self.S[i] = self.S[j]
-		self.S[j] = temp
-		t = (self.S[i]+self.S[j]) % 256
+		self.i = (self.i+1) % 256
+		self.j = (self.j+ self.S[self.i]) % 256
+		temp = self.S[self.i]
+		self.S[self.i] = self.S[self.j]
+		self.S[self.j] = temp
+		t = (self.S[self.i]+self.S[self.j]) % 256
 		k = self.S[t]
-		#temp = self.S[i]
 		return k
+
 
 
 	def getOutput(self):
@@ -83,7 +86,6 @@ class arcFour:
 		Ritorna l'output del cipher ottenuto facendo lo xor tra l'input e il keyStream
 		'''
 		output = []
-		print(type(self.input))
 		for i in range(len(self.input)):
 			keyStreamByte = self.getKeyStreamByte()	
 			outputBlock = self.input[i] ^ keyStreamByte
