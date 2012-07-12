@@ -1,7 +1,7 @@
 #/usr/bin/python
 # -*- coding: utf-8 -*-
 '''
-Testa le operazioni della clase base_operation
+Testa le operazioni del modulo 
 '''
 import sys
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
