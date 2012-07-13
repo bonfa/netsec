@@ -22,6 +22,21 @@ from packet_printer import stringInHex
 
 
 
+def getEapolKeyPart(packet):
+	'''
+	ritorna il layer wpa_key del pacchetto passato in ingresso
+	'''
+	eap_pack = packet[EAPOL]
+	eapol_key_pack = eap_pack[EAPOL_Key]
+	wpa_key = eapol_key_pack[EAPOL_WPAKey]
+	return wpa_key
+
+def checkIsFirstPacket(packet):
+	'''
+	ritorna 
+	'''
+
+
 
 #definisco le variabili principali
 path = '../pacchetti-catturati/'
@@ -35,22 +50,21 @@ groupKeyHandshakeMsg2Name = path + 'group_key_2'
 pms = 'H6x&@!1uLQ*()!12c0x\\f^\'?|s<SNgh-'
 
 
-#leggo il primo pacchetto
-p1 = rdpcap(fourWayHandshakeMsg1Name) # è una lista
-p2 = rdpcap(fourWayHandshakeMsg2Name)
-p3 = rdpcap(fourWayHandshakeMsg3Name)
-p4 = rdpcap(fourWayHandshakeMsg4Name)
+#leggo i quattro pacchetti
+# rdpcap torna una lista e quindi devo prendere il primo elemento
+p1 = rdpcap(fourWayHandshakeMsg1Name)[0] 
+p2 = rdpcap(fourWayHandshakeMsg2Name)[0]
+p3 = rdpcap(fourWayHandshakeMsg3Name)[0]
+p4 = rdpcap(fourWayHandshakeMsg4Name)[0]
 
-#print ls(EAPOL_Key)
-#print ls(EAPOL_WPAKey)
-#print ls(EAPOL)
 
-#  Ether / EAPOL KEY / EAPOL_Key / EAPOL_WPAKey
-eap_pack = p1[0][EAPOL]
-eapol_key_pack = eap_pack[EAPOL_Key]
-wpa_key = eapol_key_pack[EAPOL_WPAKey]
+# prendo la parte eapol dei pacchetti
+p1eapolKey = getEapolKeyPart(p1)
+p2eapolKey = getEapolKeyPart(p2)
+p3eapolKey = getEapolKeyPart(p3)
+p4eapolKey = getEapolKeyPart(p4)
 
-#wpa_key.sprintf(r"%EAPOL_WPAKey.WPAKeyMIC%")
+
 print '   KEY NONCE = ' + stringInHex(wpa_key.Nonce)
 
 
