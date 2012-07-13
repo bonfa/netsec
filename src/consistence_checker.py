@@ -15,9 +15,13 @@ class FourWayHandshakeConsistenceChecker():
 		self.packet_2 = p2
 		self.packet_3 = p3
 		self.packet_4 = p4
+		self.packet_1_correct_parameters = ;
+		self.packet_2_correct_parameters = ;
+		self.packet_3_correct_parameters = ;
+		self.packet_4_correct_parameters = ;
 
-
-
+		
+		
 	def isConsistent(self):
 		'''
 		Ritorna true se tutti i test di consistenza hanno successo
@@ -29,27 +33,38 @@ class FourWayHandshakeConsistenceChecker():
 		packets_address_consistence = self.macAddressConsistence()
 		return (p1_consistence and p2_consistence and p3_consistence and p4_consistence and packets_address_consistence)
 
+		
 	
 	def firstPacketCosistent(self):
 		'''
 		Ritorna true se i test di consistenza hanno successo sul primo pacchetto
 		'''
+		return self.checkPacketConsistence(self.packet_1,self.packet_1_correct_parameters)
+	
+	
 	
 	def secondPacketCosistent(self):
 		'''
 		Ritorna true se i test di consistenza hanno successo sul secondo pacchetto
 		'''
+		return self.checkPacketConsistence(self.packet_2,self.packet_2_correct_parameters)
+	
+	
 	
 	def thirdPacketCosistent(self):
 		'''
 		Ritorna true se i test di consistenza hanno successo sul terzo pacchetto
 		'''
+		return self.checkPacketConsistence(self.packet_3,self.packet_3_correct_parameters)
+	
 	
 	
 	def fourthPacketCosistent(self):
 		'''
 		Ritorna true se i test di consistenza hanno successo sul quarto pacchetto
 		'''
+		return self.checkPacketConsistence(self.packet_4,self.packet_4_correct_parameters)
+	
 	
 	
 	def macAddressConsistence(self):
@@ -77,6 +92,18 @@ class FourWayHandshakeConsistenceChecker():
 		
 		return True
 		
+		
+		
 	@Classmethod	
-	def checkPacketConsistence(self,packet,original):
-			
+	def checkPacketConsistence(self,real_packet,correct_parameter):
+		'''
+		Ritorna true se i parametri del pacchetto corrispondono a quelli corretti
+		'''
+		
+		
+		
+		
+		
+		
+		
+	
