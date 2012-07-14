@@ -117,6 +117,7 @@ class cryptoManager:
 	Classe cryptoManager
 
 	Contiene i metodi di crittografia chiamati durante le operazioni del 4 way handshake
+	@TODO: eliminare il packetObject e sostituire con le funzionalità di scapy
 	'''
 	def __init__(self,packet,packetObject,kek,kck):
 		self.kek = kek
