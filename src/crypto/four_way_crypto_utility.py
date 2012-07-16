@@ -11,6 +11,7 @@ import base_crypto_utility
 from exception import pmkTooShortException,MacNotSupportedException,InputError
 import hmac
 import hashlib
+from packet_subfields import getDescriptorFlag,setKeyMicField,getEapolPayload,printPacket
 
 
 
@@ -126,15 +127,18 @@ class cryptoManager:
 		self.packetObject = packetObject
 	
 
+
 	def getMic(self):
 		'''
 		Ritorna il MIC del pacchetto eapol
 		'''
-		# controllo che il desriptor sia corretto
+		# controllo che il descriptor sia corretto
 		eapolpacket = self.packetObject.payload
 		if eapolpacket.payload.key_information.key_descriptor_version == 1:
 			# preparo il pacchetto con il campo MIC nullo
-			packetWithNullMICField = self.clearKeyMicField()
+			packetWithNullMICFieldTuple = self.clearKeyMicField()
+			# print (packetWithNullMICFieldTuple)
+			packetWithNullMICField = (packetWithNullMICFieldTuple)
 			# tolgo l'header ethernet
 			eapolPacketWithNullMIC = self.getEapolPayload(packetWithNullMICField)		
 			# creo l'oggetto che crea il digest
@@ -145,19 +149,28 @@ class cryptoManager:
 			raise MacNotSupportedException('eapolpacket.payload.descriptor_type == 1','Not supported mic type')
 
 
+
 	def clearKeyMicField(self):
 		'''
 		Prende pacchetto e ne annulla il campo key mic
 		'''
-		packetWithNullMICField = self.packet[0:95]
+		packetWithNullMICField = self.packet[0:95]		
 		packetWithNullMICField = packetWithNullMICField + (chr(0x00)+chr(0x00)+chr(0x00)+chr(0x00)+chr(0x00)+chr(0x00)+chr(0x00)+chr(0x00))
 		packetWithNullMICField = packetWithNullMICField + (chr(0x00)+chr(0x00)+chr(0x00)+chr(0x00)+chr(0x00)+chr(0x00)+chr(0x00)+chr(0x00))
 		packetWithNullMICField = packetWithNullMICField + self.packet[95+16:]
 		return packetWithNullMICField
 		
+
+
 	@classmethod
 	def getEapolPayload(self,packet):
 		'''
 		Dal pacchetto eapol toglie l'header ethernet e ritorna solo il pacchetto eapol		
 		'''
 		return packet[14:]
+
+
+
+
+
+

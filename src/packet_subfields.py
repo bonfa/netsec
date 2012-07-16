@@ -8,6 +8,7 @@ Utilizza le propiretà di scapy
 
 from scapy.all import *
 from wpa_struct_for_scapy import *
+import copy
 
 
 
@@ -61,6 +62,41 @@ def getSecureFlag(packet):
 	return (packet.KeyInfo >> 9) & 1
 
 
+
+def getDescriptorFlag(packet):
+	'''
+	ritorna il descriptor del pacchetto in ingresso
+	Se descriptor == 1 --> HMAC_MD5_RC4
+	   descriptor == 0 --> HMAC_SHA1_AES	 
+	'''	
+	return packet.KeyInfo & 1
+	
+
+
+def getEapolPayload(packet):
+	'''
+	Dal pacchetto eapol toglie l'header ethernet e ritorna solo il pacchetto eapol		
+	'''
+	return packet[EAPOL].payload
+
+
+
+def setKeyMicField(packet,value):
+	'''
+	Ritorna un nuovo pacchetto con il campo MIC del pacchetto settato al valore passato come parametro
+	'''	
+	newPacket = copy.deepcopy(packet)
+	newPacket.WPAKeyMIC = value	
+	return newPacket
+	
+
+
+def printPacket(packet):
+	'''
+	stampa il pacchetto
+	usata per il debug
+	'''
+	print packet.show()
 
 
 

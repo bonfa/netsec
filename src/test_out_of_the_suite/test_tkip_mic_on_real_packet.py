@@ -29,6 +29,8 @@ path = '../../pacchetti-catturati/'
 messaggioPerLaGenerazioneDiChiavi = "Pairwise key expansion"
 NomeDelPacchetto1DelFourWayHandshake = path + 'four_way_1'
 NomeDelPacchetto2DelFourWayHandshake = path + 'four_way_2'
+NomeDelPacchetto3DelFourWayHandshake = path + 'four_way_3'
+NomeDelPacchetto4DelFourWayHandshake = path + 'four_way_4'
 
 
 
@@ -117,8 +119,30 @@ mic = micGen.getMic()
 packet_printer.printEthernetHeader(oggetto2Del4WayHandshake.header)
 packet_printer.printEapolHeader(oggetto2Del4WayHandshake.payload.header)
 packet_printer.printEapolPayload(oggetto2Del4WayHandshake.payload.payload)
-print '\n\n\n'
+
 #stampo il mic
-print 'MIC = ' + mic
+print 'MIC_2 = ' + mic
+
+
+##provo a calcolarlo anche per i pacchetti 3 e 4
+pacchetto3DelFourWayHandshake,oggetto3Del4WayHandshake = getObjectPacket(NomeDelPacchetto3DelFourWayHandshake)
+pacchetto4DelFourWayHandshake,oggetto4Del4WayHandshake = getObjectPacket(NomeDelPacchetto4DelFourWayHandshake)
+
+# prendo il secondo pacchetto e ne calcolo il MIC
+# annullo il mic
+micGen3 = cryptoManager(pacchetto3DelFourWayHandshake,oggetto3Del4WayHandshake,kek,kck)
+# ottengo il mic
+mic3 = micGen3.getMic()
+#stampo il mic
+print 'MIC_3 = ' + mic3
+
+
+# prendo il secondo pacchetto e ne calcolo il MIC
+# annullo il mic
+micGen4 = cryptoManager(pacchetto4DelFourWayHandshake,oggetto4Del4WayHandshake,kek,kck)
+# ottengo il mic
+mic4 = micGen4.getMic()
+#stampo il mic
+print 'MIC_4 = ' + mic4
 
 

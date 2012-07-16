@@ -157,3 +157,85 @@ except pmkTooShortException:
 	
 
 
+#four way crypto utility old
+
+
+class cryptoManager:
+	'''
+	Classe cryptoManager
+
+	Contiene i metodi di crittografia chiamati durante le operazioni del 4 way handshake
+	@TODO: eliminare il packetObject e sostituire con le funzionalità di scapy
+	'''
+	def __init__(self,packet,kek,kck):
+		self.kek = kek
+		self.kck = kck
+		self.packet = packet
+		self.packetWithNullMic = setKeyMicField(packet,'\x00'*16);
+
+
+	def getMic(self):
+		'''
+		Ritorna il MIC del pacchetto eapol
+		'''
+		# controllo che il descriptor sia corretto
+		if getDescriptorFlag(self.packet) == 1:
+			# tolgo l'header ethernet
+			eapolPacketWithNullMIC = getEapolPayload(self.packetWithNullMic)
+			#print (eapolPacketWithNullMIC)
+			printPacket(self.packetWithNullMic)
+			# creo l'oggetto che crea il digest
+			digestMaker = hmac.new(self.kck,(eapolPacketWithNullMIC),hashlib.md5)
+			# ritorno il digest			
+			return digestMaker.hexdigest()			
+		else:
+			raise MacNotSupportedException('getDescriptorFlag(self.packet)!=1','Not supported mic type')
+
+
+
+#vecchio main
+try: 
+	#controlla la coerenza sui mac_addres
+	controlloreErrori.macAddressConsistence()
+	#ritorno le anormalità nei pacchetti
+	abnormalities = controlloreErrori.getAbnormalities()
+	#stampa le abnormalità nei pacchetti se ci sono
+	print4WayHandshakeWarning(abnormalities)
+	
+	#genero psk a partire dal pms (pre master secret) e dall'SSID
+	pskGenerator = passphraseToPSKMap(pms,ssid)
+	psk = pskGenerator.getPsk()
+
+	#estraggo i due Nonce e i due macAddress
+	AA = p1.src
+	SPA = p1.dst
+	ANonce = getEapolKeyPart(p1).Nonce	
+	SNonce = getEapolKeyPart(p2).Nonce
+	
+	#genero le chiavi di sessione
+	keyGen = keyGenerator(psk,mex,AA,SPA,ANonce,SNonce)
+	[kck,kek,tk,authenticatorMicKey,supplicantMicKey] = keyGen.getKeys()
+	#print ':'.join('%02x' % ord(b) for b in kck)
+	
+	#prendo il pacchetto p3, e ne faccio il parsing
+	packetHandler = pcap.pcapObject()
+	packetHandler.open_offline('../pacchetti-catturati/'+'four_way_3')	
+	packet = packetHandler.next()
+	(pktlen, data, timestamp) = packet
+	# creo l'oggetto dal campo data	e stampo il pacchetto
+	packetSplitter = Splitter(data)			
+	packet3Obj = packetSplitter.get_packet_splitted()
+
+	#calcolo il MIC del pacchetto 3
+	cryptoMgm = cryptoManager(data,packet3Obj,kek,kck)
+	mic = cryptoMgm.getMic()
+	
+	#print mic_original
+	#printPacket(p3)
+	#hexdump(p3.WPAKeyMIC)
+	print mic
+	#print 'i mic sono diversi\n'
+
+
+
+
