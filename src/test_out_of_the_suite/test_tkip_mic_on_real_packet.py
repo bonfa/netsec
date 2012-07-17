@@ -100,6 +100,10 @@ SNonce = oggetto2Del4WayHandshake.payload.payload.key_nonce
 AA = oggetto1Del4WayHandshake.header.source_address
 SPA = oggetto1Del4WayHandshake.header.destination_address
 
+print 'AA=' + AA
+print 'SPA=' + SPA
+print 'ANonce=' + ANonce
+print 'SNonce=' + SNonce
 
 # genero la psk a partire dalla passphrase
 pskGen = passphraseToPSKMap(passphrase,ssid)
@@ -121,6 +125,8 @@ packet_printer.printEapolHeader(oggetto2Del4WayHandshake.payload.header)
 packet_printer.printEapolPayload(oggetto2Del4WayHandshake.payload.payload)
 
 #stampo il mic
+#print "KCK = " + kck
+#print "KEK = " + kek
 print 'MIC_2 = ' + mic
 
 
