@@ -11,9 +11,13 @@ Modulo che riceve i nomi dei quattro pacchetti del 4 way handshake, ne estrae i 
 #from exception import PacketError
 from pack import Pacchetto
 from consistence_checker import FourWayHandshakeConsistenceChecker
+from packet_parser import Splitter
+import pcap
+from four_way_crypto_utility import passphraseToPSKMap,keyGenerator,cryptoManager
 
 
 class FourWayHandshakeManager():
+
 
 	def __init__(self,p1name,p2name,p3name,p4name,pms,ssid):
 		self.p_1_name = p1name
@@ -28,31 +32,88 @@ class FourWayHandshakeManager():
 		self.p3 = None
 		self.p4 = None
 		self.setPackets()
+		self.kck = None
+		self.kek = None
+		self.tk = None 
+		self.authenticatorMicKey= None
+		self.supplicantMicKey = None
+		self.generateKeys()
+	
 
 
-
-	def checkPackets(self):
+	def getSessionKeys():
 		'''
-		Controlla che i pacchetti del fourway handshake siano coerenti.
-		Se c'è qualche cosa strana ritorna un messaggio contenente le anormalità
+		Ritorna la tk, authenticatorMicKey e supplicantMicKey
+		'''
+		return self.tk,self.authenticatorMicKey,self.supplicantMicKey
+
+
+
+	def checkMacAddresses(self):
+		'''
+		Controlla che i mac address siano corrispondenti
 		'''
 		#definisco il controllore di pacchetti
 		controlloreErrori = FourWayHandshakeConsistenceChecker(self.p1.scapyForm,self.p2.scapyForm,self.p3.scapyForm,self.p4.scapyForm)
 		#controlla la coerenza sui mac_addres
 		controlloreErrori.macAddressConsistence()		
-		#ritorno le anormalità nei pacchetti
-		return abnormalities = controlloreErrori.getAbnormalities()
 		
+
+
+	def checkMics(self):
+		'''
+		Controlla che i MIC dei pacchetti 2,3 e 4 siano corretti
+		'''
+		packet_list = [self.p2,self.p3,self.p4]
+		for packet in packet_list:
+			# prendo il pacchetto e ne calcolo il MIC
+			micGen = cryptoManager(packet.pcapForm,packet.objectForm,kek,kck)
+			# ottengo il mic
+			mic_generato = micGen.getMic()	
+			# controllo che il mic calcolato sia uguale al mic mandato	
+			if mic_generato != packet.object.payload.payload.key_mic:
+				raise PacketError('mic_generato != packet.object.payload.payload.key_mics','MIC generato diverso dal MIC del pacchetto')
+
+
 	
+	def getAbnormalities(self):
+		'''
+		Se c'è qualche campo che non rispetta le specifiche, ritorna un messaggio contenente le anormalità nei pacchetti
+		'''
+		#definisco il controllore di pacchetti
+		controlloreErrori = FourWayHandshakeConsistenceChecker(self.p1.scapyForm,self.p2.scapyForm,self.p3.scapyForm,self.p4.scapyForm)
+		#ritorno le anormalità nei pacchetti
+		return controlloreErrori.getAbnormalities()
+		
+
+
 	def generateKeys(self):
 		'''
+		Genera le chiavi a partire dai pacchetti
 		'''
-	
+		#genero psk a partire dal pms (pre master secret) e dall'SSID
+		pskGenerator = passphraseToPSKMap(self.pms,self.ssid)
+		psk = pskGenerator.getPsk()
+
+		#estraggo i due Nonce e i due macAddress
+		ANonce = self.p1.objectForm.payload.payload.key_nonce
+		SNonce = self.p2.objectForm.payload.payload.key_nonce
+		AA = self.p1.objectForm.header.source_address
+		SPA = self.p2.objectForm.header.destination_address
+
+		#genero le chiavi di sessione
+		keyGen = keyGenerator(psk,mex,AA,SPA,ANonce,SNonce)
+		[kck,kek,tk,authenticatorMicKey,supplicantMicKey] = keyGen.getKeys()
+		self.kck = kck
+		self.kek = kek
+		self.tk = tk
+		self.authenticatorMicKey = authenticatorMicKey
+		self.supplicantMicKey = supplicantMicKey
 
 
 	def setPackets(self):
 		'''
-		Legge i quattro pacchetti del 4 way handshake e creo le strutture pacchetto
+		Legge i quattro pacchetti del 4 way handshake e crea le strutture pacchetto
 		'''
 		p1pcap,p1object,p1scapy = getObjectPacket(self.p_1_name)
 		p1 = Pacchetto(p1pcap,p1object,p1scapy)
@@ -93,5 +154,7 @@ class FourWayHandshakeManager():
 			return original_format,packetSplitter.get_packet_splitted(),scapy_packet
 		else:
 			raise noPacketRead('packet_list.next()!= None','No packets found in input')
+
+
 
 

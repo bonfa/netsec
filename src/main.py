@@ -17,14 +17,13 @@ import logging
 logging.getLogger("scapy").setLevel(1)
 
 from scapy.all import *
-import pcap
 from wpa_struct_for_scapy import *
 from packet_printer import stringInHex
 from packet_subfields import getEapolKeyPart,printPacket
 
-from four_way_crypto_utility import passphraseToPSKMap,keyGenerator,cryptoManager
+
 from exception import PacketError
-from packet_parser import Splitter
+
 
 
 def print4WayHandshakeWarning(mex):
@@ -37,12 +36,35 @@ def print4WayHandshakeWarning(mex):
 		print 'The program will try to continue the execution'
 
 
+
+def doFourWayHandshake(NomePacchetto1_4Way,NomePacchetto2_4Way,NomePacchetto3_4Way,NomePacchetto4_4Way):
+	'''
+	Effettua tutte le operazioni in ordine del fourwayhandshake
+	'''		
+	#definisco l'oggetto che si occupa di caricare i pacchetti del fourwayhandshake e creare le chiavi
+	fourWayManager = FourWayHandshakeManager(NomePacchetto1_4Way,NomePacchetto2_4Way,NomePacchetto3_4Way,NomePacchetto4_4Way)
+	#Controllo i pacchetti
+	#controlla i mac_address
+	fourWayManager.checkMacAddresses()
+	#controlla i mic
+	fourWayManager.checkMics()
+	#ritorna le anormalità nei pacchetti
+	abnormalities = fourWayManager.getAbnormalities()
+	#stampa le abnormalità nei pacchetti se ci sono
+	print4WayHandshakeWarning(abnormalities)
+
+	#prendo le chiavi di sessione
+	return fourWayManager.getSessionKeys()
+
+
+
+
 #definisco le variabili principali
 path = '../pacchetti-catturati/'
-NomeDelPacchetto1DelFourWayHandshake = path + 'four_way_1'
-NomeDelPacchetto2DelFourWayHandshake = path + 'four_way_2'
-NomeDelPacchetto31DelFourWayHandshake = path + 'four_way_3'
-NomeDelPacchetto4DelFourWayHandshake = path + 'four_way_4'
+NomePacchetto1_4Way = path + 'four_way_1'
+NomePacchetto2_4Way = path + 'four_way_2'
+NomePacchetto3_4Way = path + 'four_way_3'
+NomePacchetto4_4Way = path + 'four_way_4'
 groupKeyHandshakeMsg1Name = path + 'group_key_1'
 groupKeyHandshakeMsg2Name = path + 'group_key_2'
 pms = 'H6x&@!1uLQ*()!12c0x\\f^\'?|s<SNgh-'
@@ -51,29 +73,10 @@ ssid = 'WWWLAN'
 
 
 try:
-	FourWayHandshakeManager(NomeDelPacchetto1DelFourWayHandshake)
-	#definisco il controllore di pacchetti
-	controlloreErrori = FourWayHandshakeConsistenceChecker(scapy_p1,scapy_p2,scapy_p3,scapy_p4)
-	#controlla la coerenza sui mac_addres
-	controlloreErrori.macAddressConsistence()		
-	#ritorno le anormalità nei pacchetti
-	abnormalities = controlloreErrori.getAbnormalities()
-	#stampa le abnormalità nei pacchetti se ci sono
-	print4WayHandshakeWarning(abnormalities)
-
-	#genero psk a partire dal pms (pre master secret) e dall'SSID
-	pskGenerator = passphraseToPSKMap(pms,ssid)
-	psk = pskGenerator.getPsk()
-
-	#estraggo i due Nonce e i due macAddress
-	ANonce = oggetto1Del4WayHandshake.payload.payload.key_nonce
-	SNonce = oggetto2Del4WayHandshake.payload.payload.key_nonce
-	AA = oggetto1Del4WayHandshake.header.source_address
-	SPA = oggetto1Del4WayHandshake.header.destination_address
+	tk,authenticatorMicKey,supplicantMicKey = doFourWayHandshake(NomePacchetto1_4Way,NomePacchetto2_4Way,NomePacchetto3_4Way,NomePacchetto4_4Way)
 	
-	#genero le chiavi di sessione
-	keyGen = keyGenerator(psk,mex,AA,SPA,ANonce,SNonce)
-	[kck,kek,tk,authenticatorMicKey,supplicantMicKey] = keyGen.getKeys()
+	print "4 way handshake successfull"
+	
 	
 
 except PacketError as (error,mex):
