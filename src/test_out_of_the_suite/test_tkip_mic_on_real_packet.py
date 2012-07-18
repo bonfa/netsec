@@ -100,10 +100,6 @@ SNonce = oggetto2Del4WayHandshake.payload.payload.key_nonce
 AA = oggetto1Del4WayHandshake.header.source_address
 SPA = oggetto1Del4WayHandshake.header.destination_address
 
-print 'AA=' + AA
-print 'SPA=' + SPA
-print 'ANonce=' + ANonce
-print 'SNonce=' + SNonce
 
 # genero la psk a partire dalla passphrase
 pskGen = passphraseToPSKMap(passphrase,ssid)
@@ -117,7 +113,7 @@ keyGen = keyGenerator(psk,messaggioPerLaGenerazioneDiChiavi,AA,SPA,ANonce,SNonce
 # annullo il mic
 micGen = cryptoManager(pacchetto2DelFourWayHandshake,oggetto2Del4WayHandshake,kek,kck)
 # ottengo il mic
-mic = micGen.getMic()
+mic = micGen.getMicHexString()
 
 #stampo il pacchetto
 packet_printer.printEthernetHeader(oggetto2Del4WayHandshake.header)
@@ -138,7 +134,7 @@ pacchetto4DelFourWayHandshake,oggetto4Del4WayHandshake = getObjectPacket(NomeDel
 # annullo il mic
 micGen3 = cryptoManager(pacchetto3DelFourWayHandshake,oggetto3Del4WayHandshake,kek,kck)
 # ottengo il mic
-mic3 = micGen3.getMic()
+mic3 = micGen3.getMicHexString()
 #stampo il mic
 print 'MIC_3 = ' + mic3
 
@@ -147,7 +143,7 @@ print 'MIC_3 = ' + mic3
 # annullo il mic
 micGen4 = cryptoManager(pacchetto4DelFourWayHandshake,oggetto4Del4WayHandshake,kek,kck)
 # ottengo il mic
-mic4 = micGen4.getMic()
+mic4 = micGen4.getMicHexString()
 #stampo il mic
 print 'MIC_4 = ' + mic4
 

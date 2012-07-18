@@ -74,16 +74,9 @@ class FourWayHandshakeManager():
 			# ottengo il mic
 			mic_generato = micGen.getMic()	
 			# controllo che il mic calcolato sia uguale al mic mandato
-			print (mic_generato)
-			
-			'''trasformare la stringa esadecimale in unsigned'''	
-			string = ''
-			value = packet.objectForm.payload.payload.key_mic
-			for b in value:
-				string = string + str(hex(ord(b))).replace('0x','')
-			print string
-			
-			if mic_generato != string: #packet.objectForm.payload.payload.key_mic:
+			mic_raw_data = micGen.getMicByte()
+	
+			if mic_raw_data != packet.objectForm.payload.payload.key_mic:
 				raise PacketError('mic_generato != packet.object.payload.payload.key_mics','MIC generato diverso dal MIC del pacchetto')
 
 

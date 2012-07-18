@@ -12,7 +12,7 @@ from exception import pmkTooShortException,MacNotSupportedException,InputError
 import hmac
 import hashlib
 from packet_subfields import getDescriptorFlag,setKeyMicField,getEapolPayload,printPacket
-
+import binascii
 
 
 class keyGenerator:
@@ -127,10 +127,20 @@ class cryptoManager:
 		self.packetObject = packetObject
 	
 
+	
+	def getMicString(self):
+		'''
+		Ritorna la stringa che rappresenta il MIC del pacchetto eapol
+		'''
+		micStr = self.getMic()
+		return binascii.unhexlify(micStr)
+	
 
-	def getMic(self):
+
+	def getMicHexString(self):
 		'''
 		Ritorna il MIC del pacchetto eapol
+		La stringa contiene dei caratteri esadecimali (esempio AA BB CC DD EE)
 		'''
 		# controllo che il descriptor sia corretto
 		eapolpacket = self.packetObject.payload
@@ -171,6 +181,4 @@ class cryptoManager:
 
 
 
-
-
-
+		
