@@ -23,7 +23,7 @@ from packet_subfields import getEapolKeyPart,printPacket
 from four_way_handshake import FourWayHandshakeManager
 import binascii
 from exception import PacketError
-
+from tkip import TkipDecryptor
 
 
 def print4WayHandshakeWarning(mex):
@@ -84,8 +84,12 @@ def getDecriptedPacket(criptedPacket,temporalKey,authenticatorMicKey,supplicantM
 	'''
 	Prende in ingresso un pacchetto criptato e lo decripta
 	'''
-
-
+	#print 'packet = ' 
+	#print binascii.hexlify(str(criptedPacket))
+	#print binascii.hexlify(str(criptedPacket[Dot11WEP]))
+	decryptor = TkipDecryptor(criptedPacket,temporalKey,authenticatorMicKey)
+	plaintext = decryptor.getDecryptedPacket()
+	print binascii.hexlify(plaintext)
 
 
 #definisco le variabili principali
