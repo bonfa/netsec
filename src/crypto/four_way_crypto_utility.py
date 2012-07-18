@@ -132,7 +132,7 @@ class cryptoManager:
 		'''
 		Ritorna la stringa che rappresenta il MIC del pacchetto eapol
 		'''
-		micStr = self.getMic()
+		micStr = self.getMicHexString()
 		return binascii.unhexlify(micStr)
 	
 

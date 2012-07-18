@@ -44,7 +44,7 @@ class FourWayHandshakeManager():
 	
 
 
-	def getSessionKeys():
+	def getSessionKeys(self):
 		'''
 		Ritorna la tk, authenticatorMicKey e supplicantMicKey
 		'''
@@ -72,10 +72,8 @@ class FourWayHandshakeManager():
 			# prendo il pacchetto e ne calcolo il MIC
 			micGen = cryptoManager(packet.pcapForm,packet.objectForm,self.kek,self.kck)
 			# ottengo il mic
-			mic_generato = micGen.getMic()	
+			mic_raw_data = micGen.getMicString()
 			# controllo che il mic calcolato sia uguale al mic mandato
-			mic_raw_data = micGen.getMicByte()
-	
 			if mic_raw_data != packet.objectForm.payload.payload.key_mic:
 				raise PacketError('mic_generato != packet.object.payload.payload.key_mics','MIC generato diverso dal MIC del pacchetto')
 
