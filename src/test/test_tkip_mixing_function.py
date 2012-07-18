@@ -6,7 +6,7 @@ OSS: in tutti i test il tsc è definito con i byte inversi rispetto al test vect
 '''
 import sys
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
-from tkip_encryption import TKIPphaseOne,TKIPvariableSplitter,TKIPphaseTwo,TKIPmixingFunction
+from tkip_functions import TKIPphaseOne,TKIPvariableSplitter,TKIPphaseTwo,TKIPmixingFunction
 import unittest
 import struct
 
