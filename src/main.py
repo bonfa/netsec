@@ -89,7 +89,7 @@ def getDecriptedPacket(criptedPacket,temporalKey,authenticatorMicKey,supplicantM
 	#print binascii.hexlify(str(criptedPacket[Dot11WEP]))
 	decryptor = TkipDecryptor(criptedPacket,temporalKey,authenticatorMicKey)
 	plaintext = decryptor.getDecryptedPacket()
-	print binascii.hexlify(plaintext)
+	print (plaintext)
 
 
 #definisco le variabili principali
