@@ -10,9 +10,8 @@ sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/common_utility')
 
 class arcFour:
 	'''
-	classe arcFour
-	
-	Rappresenta un cipher RC4
+	classe arcFour - è un qualcosa di più del cipher rc4 vero e proprio.
+	Questa classe riceve in input il seed e il dato in input e ritorna l'output
 	'''
 	
 

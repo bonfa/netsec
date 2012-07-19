@@ -86,3 +86,32 @@ class PacketError(Error):
 		self.expr = expr
 		self.msg = msg
 
+
+
+class WepError(Error):
+	"""Exception raised when there are some errors in the wep algorithm
+
+	Attributes:
+		expr -- input expression in which the error occurred
+		msg  -- explanation of the error
+	"""
+	def __init__(self, expr, msg):
+		self.expr = expr
+		self.msg = msg
+
+
+
+class TKIPError(Error):
+	"""Exception raised when there are some errors in the tkip algorithm
+
+	Attributes:
+		expr -- input expression in which the error occurred
+		msg  -- explanation of the error
+	"""
+	def __init__(self, expr, msg):
+		self.expr = expr
+		self.msg = msg
+
+
+
+

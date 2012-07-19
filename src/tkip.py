@@ -8,11 +8,12 @@ Effettua le due operazioni di encryption e decryption del tkip
 from scapy.all import *
 import sys
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/utilities')
 from tkip_functions import TKIPmixingFunction
-from rc4 import arcFour
+from exception import TKIPError
 import struct
 import binascii
-
+from wep import WepDecryption
 
 def getTSCfromPacket(packet):
 	'''
@@ -54,10 +55,18 @@ class TkipDecryptor():
 	
 
 
+	def checkMic(self):
+		'''
+		Controllo che il mic calcolato sia uguale al mic generato
+		@TODO: implementare il metodo
+		'''
+		return True
+
 
 	def getMic(self):
 		'''
 		Ritorna il MIC del pacchetto
+		@TODO: implementare il metodo
 		'''
 			
 	
@@ -66,6 +75,7 @@ class TkipDecryptor():
 		'''
 		Ritorna il pacchetto decriptato con la chiave
 		Il metodo funziona solo con msdu che non vengono frammentata
+
 		@TODO: introdurre la correzione per msdu che vengono frammentate in mpdu
 		'''
 		#creo la mixing function
@@ -76,37 +86,50 @@ class TkipDecryptor():
 		
 		# Non controllo il numero del pacchetto
 		# l'mpdu è il pacchetto
-		
-		mpdu = struct.unpack('80B',str(self.packet[Dot11WEP]))
-		
-		# Creo il cipher		
-		cipher = arcFour(struct.unpack('16B',self.tk))
-		# imposto l'input
-		cipher.setInput(mpdu)
-		
-		# effettuo la cifratura
-		plaintextTuple = cipher.getOutput()
+		#mpduTempstring = str(self.packet[Dot11WEP])
+		#mpduPacket = Dot11WEP(mpduTempstring)
+		#mpduPacket.show()
 
-		# manca il controllo del mic
-		
-		# separo la tupla nei singoli valori
-		p0,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,p17,p18,p19,p20,p21,p22,p23,p24,p25,p26,p27,p28,p29,p30,p31,p32,p33,p34,p35,p36,p37,p38,p39,p40,p41,p42,p43,p44,p45,p46,p47,p48,p49,p50,p51,p52,p53,p54,p55,p56,p57,p58,p59,p60,p61,p62,p63,p64,p65,p66,p67,p68,p69,p70,p71,p72,p73,p74,p75,p76,p77,p78,p79 = plaintextTuple
-
-		# ritorno la stringa 
-		plaintext = struct.pack('80B',p0,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,p17,p18,p19,p20,p21,p22,p23,p24,p25,p26,p27,p28,p29,p30,p31,p32,p33,p34,p35,p36,p37,p38,p39,p40,p41,p42,p43,p44,p45,p46,p47,p48,p49,p50,p51,p52,p53,p54,p55,p56,p57,p58,p59,p60,p61,p62,p63,p64,p65,p66,p67,p68,p69,p70,p71,p72,p73,p74,p75,p76,p77,p78,p79)
+		print len(self.packet[Dot11WEP].wepdata) 
+		mpdu = struct.unpack('72B',str(self.packet[Dot11WEP].wepdata))
+				
+		# Creo il wep decryptor
+		decryptor = WepDecryption(wepSeed,mpdu);
+		# Estraggo il plainText	
+		plainText = decryptor.getDecryptedData()
 	
-		# ritorno il plaintext
-		return plaintext
-
+		# Controllo il MIC
+		if self.checkMic():
+			#stampo il pacchetto
+			print "pacchetto = "
+			print plainText
+			print "fine pacchetto = "
+			# assemblo il pacchetto
+			mpduPacket = Dot11WEP(plainText)
+			mpduPacket.show()
+			# ritorno il plaintext
+			return plainText
+		else:
+			#errore MIC
+			raise TKIPError('checkMic()','MIC does not match')
+		
 
 	
+
 	def getDecryptedPacket(self):
 		'''
 		Prendo il payload decriptato, lo appendo all'header e ritorno il pacchetto completo
 		'''		
 		decriptedPayload = self.decryptPayload()
+		#print "Radio = " + str(self.packet[RadioTap])
+		#print str(self.packet[RadioTap]) ==  str(self.packet[Dot11])
+		#print "Dot11 = " + str(self.packet[Dot11])
+		#print "Payload = " + decriptedPayload + "\n\n\n"
+
 		strPacket = str(self.packet[RadioTap])+str(self.packet[Dot11])+decriptedPayload
-		return strPacket
+		newPack = RadioTap(strPacket)
+
+		return newPack
 
 
 
