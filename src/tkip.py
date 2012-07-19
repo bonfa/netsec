@@ -86,27 +86,27 @@ class TkipDecryptor():
 		
 		# Non controllo il numero del pacchetto
 		# l'mpdu è il pacchetto
-		#mpduTempstring = str(self.packet[Dot11WEP])
-		#mpduPacket = Dot11WEP(mpduTempstring)
-		#mpduPacket.show()
-
-		print len(self.packet[Dot11WEP].wepdata) 
+		print (self.packet[Dot11WEP].wepdata) 
 		mpdu = struct.unpack('72B',str(self.packet[Dot11WEP].wepdata))
 				
 		# Creo il wep decryptor
-		decryptor = WepDecryption(wepSeed,mpdu);
+		icv = self.packet[Dot11WEP].icv
+		decryptor = WepDecryption(wepSeed,mpdu,icv);
 		# Estraggo il plainText	
 		plainText = decryptor.getDecryptedData()
 	
 		# Controllo il MIC
 		if self.checkMic():
 			#stampo il pacchetto
-			print "pacchetto = "
-			print plainText
-			print "fine pacchetto = "
+			#print "pacchetto = "
+			#print plainText
+			#print "fine pacchetto = "
 			# assemblo il pacchetto
-			mpduPacket = Dot11WEP(plainText)
-			mpduPacket.show()
+			#self.packet[Dot11WEP].show()
+			print "\n\n"
+			dot11LayerStr = str(self.packet[Dot11WEP].icv) + str(self.packet[Dot11WEP].keyid)+plainText+str(self.packet[Dot11WEP].keyid)
+			mpduPacket = Dot11WEP(dot11LayerStr)
+			#mpduPacket.show()
 			# ritorno il plaintext
 			return plainText
 		else:
