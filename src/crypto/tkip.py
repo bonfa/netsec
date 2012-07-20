@@ -33,7 +33,8 @@ def getTSCfromPacket(packet):
 	tsc5 =  int(binascii.hexlify(data[3]),16)
 	
 	#creo il tsc --> lo creo come lista
-	tsc = struct.pack('6B',tsc0,tsc1,tsc2,tsc3,tsc4,tsc5)
+	#tsc = struct.pack('6B',tsc0,tsc1,tsc2,tsc3,tsc4,tsc5)
+	tsc = struct.pack('6B',tsc5,tsc4,tsc3,tsc2,tsc1,tsc0)
 	return tsc
 
 
