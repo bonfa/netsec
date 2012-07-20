@@ -84,15 +84,10 @@ def getDecriptedPacket(criptedPacket,temporalKey,authenticatorMicKey,supplicantM
 	'''
 	Prende in ingresso un pacchetto criptato e lo decripta
 	'''
-	#print 'crypted = ' 
-	#print (criptedPacket).show()
-	#print binascii.hexlify(str(criptedPacket))
-	#print binascii.hexlify(str(criptedPacket[Dot11WEP]))
 	decryptor = TkipDecryptor(criptedPacket,temporalKey,authenticatorMicKey)
 	plaintext = decryptor.getDecryptedPacket()
 	return plaintext	
-	#print 'decrypted = ' 
-	#print (plaintext).show()
+	
 
 
 #definisco le variabili principali
@@ -125,11 +120,16 @@ try:
 	
 	# prendo il primo pacchetto che sicuramente è un pacchetto dati
 	dataPack = criptedPacketList[1]
+	dataPack.show()	
+
+	
 	# provo a decriptarlo con le chiavi
 	decrypted = getDecriptedPacket(dataPack,tk,authenticatorMicKey,supplicantMicKey)
-	print "\n\n\n"	
+
+	#stampo il pacchetto decriptato
+	print "\n\n"
 	decrypted.show()	
-	#wireshark(decrypted)
+	
 
 
 except PacketError as (error,mex):

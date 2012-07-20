@@ -15,6 +15,8 @@ import struct
 import binascii
 from wep import WepDecryption
 
+
+
 def getTSCfromPacket(packet):
 	'''
 	Riceve in ingresso un pacchetto e ritorna il campo TSC
@@ -74,7 +76,7 @@ class TkipDecryptor():
 	def decryptPayload(self):
 		'''
 		Ritorna il pacchetto decriptato con la chiave
-		Il metodo funziona solo con msdu che non vengono frammentata
+		Il metodo funziona solo con msdu che non vengono frammentate
 
 		@TODO: introdurre la correzione per msdu che vengono frammentate in mpdu
 		'''
@@ -85,28 +87,22 @@ class TkipDecryptor():
 		wepSeed = mixingFunction.getWepSeed()
 		
 		# Non controllo il numero del pacchetto
+
 		# l'mpdu è il pacchetto
-		print (self.packet[Dot11WEP].wepdata) 
-		mpdu = struct.unpack('72B',str(self.packet[Dot11WEP].wepdata))
-				
+		tkipMpduStr = str(self.packet[Dot11WEP])
+
+		#  primi 8 byte sono i vari campi del "tkip"
+		mpdu = struct.unpack('72B',tkipMpduStr[8:])
+
+					
 		# Creo il wep decryptor
-		icv = self.packet[Dot11WEP].icv
-		decryptor = WepDecryption(wepSeed,mpdu,icv);
+		decryptor = WepDecryption(wepSeed,mpdu);
 		# Estraggo il plainText	
 		plainText = decryptor.getDecryptedData()
 	
+
 		# Controllo il MIC
 		if self.checkMic():
-			#stampo il pacchetto
-			#print "pacchetto = "
-			#print plainText
-			#print "fine pacchetto = "
-			# assemblo il pacchetto
-			#self.packet[Dot11WEP].show()
-			print "\n\n"
-			dot11LayerStr = str(self.packet[Dot11WEP].icv) + str(self.packet[Dot11WEP].keyid)+plainText+str(self.packet[Dot11WEP].keyid)
-			mpduPacket = Dot11WEP(dot11LayerStr)
-			#mpduPacket.show()
 			# ritorno il plaintext
 			return plainText
 		else:
@@ -121,15 +117,15 @@ class TkipDecryptor():
 		Prendo il payload decriptato, lo appendo all'header e ritorno il pacchetto completo
 		'''		
 		decriptedPayload = self.decryptPayload()
-		#print "Radio = " + str(self.packet[RadioTap])
-		#print str(self.packet[RadioTap]) ==  str(self.packet[Dot11])
-		#print "Dot11 = " + str(self.packet[Dot11])
-		#print "Payload = " + decriptedPayload + "\n\n\n"
 
-		strPacket = str(self.packet[RadioTap])+str(self.packet[Dot11])+decriptedPayload
-		newPack = RadioTap(strPacket)
+		#print "\n\n"
+		#	dot11LayerStr = str(self.packet[Dot11WEP].icv) + str(self.packet[Dot11WEP].keyid)+plainText+str(self.packet[Dot11WEP].keyid)
+		#	mpduPacket = Dot11WEP(dot11LayerStr)
+			#mpduPacket.show()
+		decryptedPacket = self.packet
+		decryptedPacket.wepdata = decriptedPayload
 
-		return newPack
+		return decryptedPacket
 
 
 
