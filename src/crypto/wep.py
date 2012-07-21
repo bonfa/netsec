@@ -6,7 +6,7 @@ Effettua le due operazioni di encryption e decryption del wep
 '''
 
 import binascii
-from exception import WepError
+#from exception import WepError
 import sys
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/utilities')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
@@ -83,6 +83,68 @@ class WepDecryption():
 
 	
 
+class WepEncryption():
+	'''
+	Effettua l'encryption wep
 	
+	iv, key, plaintext sono tuple
+	'''
+	def __init__(self,iv,key,plaintext):
+		#concateno iv e key
+		self.seed = iv + key
+		self.plaintext = plaintext
+
+	
+	
+	def getCiphertext(self):
+		'''
+		Ritorna il plaintext criptato con wep
+		'''		
+		#definisco il cipher
+		cipher = arcFour(self.seed)
 		
+		#calcolo il crc32 del plaintext sarà una lista
+		crc32List  = self.crc32()
+
+		#appendo il crc32 al plaintext
+		plaintextList = list(self.plaintext)
+
+		#creo la tupla che va in xor con il keystream
+		plain = tuple(plaintextList+crc32List)
+		
+		# faccio lo xor tra il risultato e il keystream
+		output = []
+		for i in range(len(plain)):
+			keyStreamByte = cipher.getKeyStreamByte()	
+			outputBlock = plain[i] ^ keyStreamByte
+			output.append(outputBlock)
+		return tuple(output)
+		
+
+
+
+def crc32(data):
+	'''
+	Ritorna il crc32 del data
+	data è una tupla
+	'''
+	dataString = tupleToString(data)
+	return binascii.crc32(dataString)
+
+
+
+
+def tupleToString(aTuple):
+	'''
+	Riceve in ingresso una tupla di valori esadecimali e ritorna la stringa ottenuta convertendo ciascun valore decimale nel suo simbolo (carattere) corrispondente
+	'''
+	# Converto ciascun valore nel suo carattere corrispondente
+	b = []
+	for i in range(len(aTuple)):
+		b.append(chr(aTuple[i]))
+	# Faccio il join di tutti i caratteri
+	c = ''.join(b)
+	return c
+
+
 
