@@ -103,7 +103,7 @@ class WepEncryption():
 		#definisco il cipher
 		cipher = arcFour(self.seed)
 		
-		#calcolo il crc32 del plaintext sarà una lista
+		#calcolo il crc32 del plaintext --> intero
 		crc32List  = self.crc32()
 
 		#appendo il crc32 al plaintext
@@ -123,14 +123,27 @@ class WepEncryption():
 
 
 
-def crc32(data):
+def crc32Value(data):
 	'''
 	Ritorna il crc32 del data
 	data è una tupla
+	crc32 è un long
 	'''
 	dataString = tupleToString(data)
 	return binascii.crc32(dataString)
 
+
+
+def crc32Tuple(data):
+	'''
+	Ritorna il crc32 del data
+	data è una tupla
+	crc32 è una tupla
+	'''
+	crcValue = crc32Value(data)
+	crcString = struct.pack('I',crcValue)
+	crcTuple = struct.unpack('4B',crcString)
+	return crcTuple
 
 
 
