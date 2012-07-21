@@ -82,25 +82,25 @@ class TkipDecryptor():
 
 		@TODO: introdurre la correzione per msdu che vengono frammentate in mpdu
 		'''
-		#creo la mixing function
+		# Creo la mixing function
 		mixingFunction = TKIPmixingFunction(self.tk,self.ta,self.tsc)
 		
-		#calcolo il wep seed
+		# Calcolo il wep seed (tupla)
 		wepSeed = mixingFunction.getWepSeed()
 		
 		# Non controllo il numero del pacchetto
 
-		# l'mpdu è il pacchetto
+		# L'mpdu è il pacchetto meno i primi 8 byte --> li tolgo alla prossima istruzione
 		tkipMpduStr = str(self.packet[Dot11WEP])
 
-		#  primi 8 byte sono i vari campi del "tkip"
+		# I primi 8 byte sono i vari campi del "tkip"
 		mpdu = struct.unpack('72B',tkipMpduStr[8:])
-
-					
+							
 		# Creo il wep decryptor
-		decryptor = WepDecryption(wepSeed,mpdu);
+		decryptor = WepDecryption(wepSeed[:3],wepSeed[3:],mpdu)
+
 		# Estraggo il plainText	
-		plainText = decryptor.getDecryptedData()
+		plainText = decryptor.getPlaintextAndIcv()
 	
 
 		# Controllo il MIC
@@ -120,14 +120,13 @@ class TkipDecryptor():
 		'''		
 		decriptedPayload = self.decryptPayload()
 
-		#print "\n\n"
-		#	dot11LayerStr = str(self.packet[Dot11WEP].icv) + str(self.packet[Dot11WEP].keyid)+plainText+str(self.packet[Dot11WEP].keyid)
-		#	mpduPacket = Dot11WEP(dot11LayerStr)
-			#mpduPacket.show()
+		
 		decryptedPacket = self.packet
 		decryptedPacket.wepdata = decriptedPayload
 
 		return decryptedPacket
+
+
 
 
 
@@ -157,27 +156,6 @@ class TkipEncryptor():
 		'''
 		Ritorna il pacchetto criptato con la chiave
 		'''
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 	

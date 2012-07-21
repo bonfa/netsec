@@ -110,6 +110,8 @@ try:
 	tk,authenticatorMicKey,supplicantMicKey = doFourWayHandshake(NomePacchetto1_4Way,NomePacchetto2_4Way,NomePacchetto3_4Way,NomePacchetto4_4Way,pms,ssid)
 	
 	#stampo le chiavi di sessione ottenute
+	#tk_rev = (tk[0:16])[::-1]
+	#tk = tk_rev
 	printKeys(tk,authenticatorMicKey,supplicantMicKey)
 	print ""
 	

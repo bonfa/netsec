@@ -4,7 +4,7 @@
 Testa le operazioni della clase base_operation
 '''
 import sys
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/authentication')
 from four_way_crypto_utility import passphraseToPSKMap
 import unittest
 import struct
@@ -43,6 +43,14 @@ class TestPassphraseInPwdMapping(unittest.TestCase):
 		hexPsk = psk.encode("hex")
 		self.assertEqual(PSK,hexPsk)
 
+	def test_4_mia_psk(self):
+		Passphrase = "H6x&@!1uLQ*()!12c0x\\f^\'?|s<SNgh-"
+		SSID = 'WWWLAN'
+		PSK = "3f4eb9a38ba03f3a28235fd038971be12845a57169c2801d729afa6711f6db96"
+		pskGen = passphraseToPSKMap(Passphrase,SSID)
+		psk = pskGen.getPsk()
+		hexPsk = psk.encode("hex")
+		self.assertEqual(PSK,hexPsk)
 
 
 if __name__ == '__main__':

@@ -71,6 +71,8 @@ class WepDecryption():
 		icv_received è una tupla
 		'''
 		icv_processed = crc32Tuple(plaintext)
+		print icv_processed
+		print icv_received
 		return (icv_received == icv_processed)
 
 
@@ -137,7 +139,7 @@ def crc32Tuple(data):
 	data è una tupla
 	crc32 è una tupla
 	'''
-	crcValue = crc32Value(data)
+	crcValue = crc32Value(data) & 0xffffffff
 	crcString = struct.pack('I',crcValue)
 	crcTuple = struct.unpack('4B',crcString)
 	return crcTuple
