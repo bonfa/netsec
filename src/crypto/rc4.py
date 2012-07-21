@@ -12,6 +12,8 @@ class arcFour:
 	'''
 	classe arcFour - è un qualcosa di più del cipher rc4 vero e proprio.
 	Questa classe riceve in input il seed e il dato in input e ritorna l'output
+	I METODI setInput e getOutput sono usati solo nei test
+	@TODO: spostare i metodi setInput e getOutput da un'altra parte
 	'''
 	
 

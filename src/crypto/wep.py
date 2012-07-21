@@ -6,88 +6,81 @@ Effettua le due operazioni di encryption e decryption del wep
 '''
 
 import binascii
-#from exception import WepError
 import sys
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/utilities')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
+from exception import WepError
 from rc4 import arcFour
 import struct
 
 
 class WepDecryption():
 	'''
-	Effettua la decriptazione wep
-	Il wep seed viene passato nel costruttore
+	Effettua la decryption wep
+	iv, key, ciphertext sono tuple
+
+	@TODO: inserire i controlli sulla lunghezza della chiave (5 o 13 byte) dell'iv (3 byte) 
 	'''
+	def __init__(self,iv,key,ciphertext):
+		if type(iv) != tuple:
+			raise TypeError("iv type must be 'tuple'")
+		if type(key) != tuple:
+			raise TypeError("key type must be 'tuple'")
+		if type(ciphertext) != tuple:
+			raise TypeError("plaintext type must be 'tuple'")
+		#concateno iv e key
+		self.seed = iv + key
+		self.ciphertext = ciphertext
 
-	def __init__(self,wepSeed,cipherText):
-		self.wepSeed = wepSeed
-		self.cipherText = cipherText
 
-	
-	def getDecryptedData(self):
+
+	def getPlaintextAndIcv(self):
 		'''
-		Se l'ICV è corretto, ritorna i dati decriptati
-		@TODO: trovare un modo migliore per separare la tupla nei suoi valori
+		Ritorna il plaintext + icv
+		il plaintext è una tupla
 		'''
-		# Creo il cipher
-		cipher = arcFour(self.wepSeed)
-		cipher.setInput(self.cipherText)
+		#definisco il cipher
+		cipher = arcFour(self.seed)
 		
-		# Decifro
-		decriptedTuple = cipher.getOutput()
+		arc4Input = self.ciphertext
 		
-		#print 'Len(ciphertext) = ' + str(len(self.cipherText))
-		#print 'Len(plaintext) = ' + str(len(decriptedTuple))
-		# separo la tupla nei singoli valori
-		p0,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,p17,p18,p19,p20,p21,p22,p23,p24,p25,p26,p27,p28,p29,p30,p31,p32,p33,p34,p35,p36,p37,p38,p39,p40,p41,p42,p43,p44,p45,p46,p47,p48,p49,p50,p51,p52,p53,p54,p55,p56,p57,p58,p59,p60,p61,p62,p63,p64,p65,p66,p67,p68,p69,p70,p71 = (decriptedTuple)
+		# faccio lo xor tra il ciphertext e il keystream
+		output = []
+		for i in range(len(arc4Input)):
+			keyStreamByte = cipher.getKeyStreamByte()	
+			outputBlock = arc4Input[i] ^ keyStreamByte
+			output.append(outputBlock)
+		plaintextAndCrc = tuple(output)
 
-		# ritorno alla stringa 
-		plaintext = struct.pack('<72B',p0,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12,p13,p14,p15,p16,p17,p18,p19,p20,p21,p22,p23,p24,p25,p26,p27,p28,p29,p30,p31,p32,p33,p34,p35,p36,p37,p38,p39,p40,p41,p42,p43,p44,p45,p46,p47,p48,p49,p50,p51,p52,p53,p54,p55,p56,p57,p58,p59,p60,p61,p62,p63,p64,p65,p66,p67,p68,p69,p70,p71)
-				
-		#prendo plaintext e icv dal pacchetto decritpato		
-		payload = plaintext[0:len(plaintext)-4]
-		icv = plaintext[len(plaintext)-4:len(plaintext)]
-
+		mex = plaintextAndCrc[:-4]
+		icv = plaintextAndCrc[-4:]
 		# calcolo l'icv del pacchetto e controllo che sia uguale all'icv reale
-		icv_ok = self.checkICV(payload,icv)
+		icv_ok = self.checkICV(mex,icv)
 
 		if icv_ok:
-			return plaintext
+			return plaintextAndCrc
 		else:
 			raise WepError('icv_ok','ICV does not match');
 
 
-
-	def checkICV(self,plaintext,icv_received_str):
+	
+	def checkICV(self,plaintext,icv_received):
 		'''
 		Controlla che l'ICV sia corretto
+		plaintext è una tupla
+		icv_received è una tupla
 		'''
-		# calcola l'icv
-		icv_processed = int(binascii.crc32(plaintext) & 0xffffffff)
+		icv_processed = crc32Tuple(plaintext)
+		return (icv_received == icv_processed)
 
-		# prendo l'icv ricevuto (stringa) e lo converto in numero
-		icv_received = struct.unpack('I',icv_received_str)[0]
 
-		#stampa
-		print "ICV PROCESSED"
-		print (icv_processed)
-		print "\nICV RECEIVED"	
-		print (icv_received)
-
-		# controllo
-		if icv_received == icv_processed:
-			return True
-		else:	
-			return True
-
-	
 
 class WepEncryption():
 	'''
 	Effettua l'encryption wep
-	
 	iv, key, plaintext sono tuple
+	
+	@TODO: inserire i controlli sulla lunghezza della chiave (5 o 13 byte) dell'iv (3 byte) 
 	'''
 	def __init__(self,iv,key,plaintext):
 		if type(iv) != tuple:
