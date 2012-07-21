@@ -18,6 +18,7 @@ class TKIPmixingFunction:
 	Classe TKIPmixingFunction
 
 	Implementazione della mixing function usata dal tkip per criptare
+	tk,ta,tsc sono stringhe
 	'''
 	def __init__(self,tk,ta,tsc):
 		self.tk = tk
@@ -41,6 +42,7 @@ class TKIPphaseOne:
 	Classe TKIPphaseOne
 
 	Effettua la fase 1 della mixing function utilizzata durante la crittografia del tkip
+	tk,ta,tsc sono stringhe	
 	'''
 	def __init__(self,tk,ta,tsc):
 		self.tk = tk
@@ -88,6 +90,9 @@ class TKIPphaseTwo:
 	Classe TKIPphaseTwo
 
 	Effettua la fase 2 della mixing function utilizzata durante la crittografia del tkip
+	ttak è una tupla
+	tk,tsc sono stringhe
+	wepSeed è una tupla	
 	'''
 	def __init__(self,ttak,tk,tsc):
 		self.ttak = ttak
@@ -99,6 +104,7 @@ class TKIPphaseTwo:
 	def getWEPSeed(self):
 		'''
 		calcola il WEPSeed da ttak,tk e tsc. L'algoritmo è descritto a pagina 178 della rfc
+		wepSeed è una tupla
 		'''
 		# prendo i valori di input separati in byte
 		tk0,tk1,tk2,tk3,tk4,tk5,tk6,tk7,tk8,tk9,tk10,tk11,tk12,tk13,tk14,tk15 = self.attributeSplitter.getSplittedTK()

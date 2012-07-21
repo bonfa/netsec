@@ -33,8 +33,8 @@ def getTSCfromPacket(packet):
 	tsc5 =  int(binascii.hexlify(data[3]),16)
 	
 	#creo il tsc --> lo creo come lista
-	#tsc = struct.pack('6B',tsc0,tsc1,tsc2,tsc3,tsc4,tsc5)
-	tsc = struct.pack('6B',tsc5,tsc4,tsc3,tsc2,tsc1,tsc0)
+	tsc = struct.pack('6B',tsc0,tsc1,tsc2,tsc3,tsc4,tsc5)
+	#tsc = struct.pack('6B',tsc5,tsc4,tsc3,tsc2,tsc1,tsc0)
 	return tsc
 
 
@@ -43,7 +43,8 @@ def getTSCfromPacket(packet):
 class TkipDecryptor():
 	'''
 	Questa classe riceve in ingresso il pacchetto critpato e le chiavi per effettuare la decryption.
-	Usando le chiavi decripta il pacchetto e ne contraolla il MIC
+	Usando le chiavi decripta il pacchetto e ne controlla il MIC
+	packet = pacchetto scapy (Dot11Wep)
 	'''
 	def __init__(self,packet,temporalKey,micKey):
 		self.packet = packet
