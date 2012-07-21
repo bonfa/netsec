@@ -61,7 +61,7 @@ class TestRC4(unittest.TestCase):
 		processedResult = cipher.getOutput()
 		expectedResult = (0x75,0xb7,0x87,0x80,0x99,0xe0,0xc5,0x96)
 		self.assertEqual(processedResult,expectedResult) 
-		
+
 
 
 	def test_4(self):
@@ -76,7 +76,7 @@ class TestRC4(unittest.TestCase):
 		processedResult = cipher.getOutput()
 		expectedResult = (0xde,0x18,0x89,0x41,0xa3,0x37,0x5d,0x3a)
 		self.assertEqual(processedResult,expectedResult) 
-		
+
 
 
 	def test_5(self):
@@ -84,7 +84,7 @@ class TestRC4(unittest.TestCase):
 		testo la classe arcFour
 		test numero 4 di http://www.freemedialibrary.com/index.php/RC4_test_vectors
 		'''
-		
+
 		key = (0xef,0x01,0x23,0x45)
 		plainText = (0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00)		
 		cipher = arcFour(key)		
@@ -92,7 +92,7 @@ class TestRC4(unittest.TestCase):
 		processedResult = cipher.getOutput()
 		expectedResult = (0xd6,0xa1,0x41,0xa7,0xec,0x3c,0x38,0xdf,0xbd,0x61)
 		self.assertEqual(processedResult,expectedResult) 
-		
+
 
 
 	def test_7(self):

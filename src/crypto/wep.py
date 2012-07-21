@@ -90,6 +90,12 @@ class WepEncryption():
 	iv, key, plaintext sono tuple
 	'''
 	def __init__(self,iv,key,plaintext):
+		if type(iv) != tuple:
+			raise TypeError("iv type must be 'tuple'")
+		if type(key) != tuple:
+			raise TypeError("key type must be 'tuple'")
+		if type(plaintext) != tuple:
+			raise TypeError("plaintext type must be 'tuple'")
 		#concateno iv e key
 		self.seed = iv + key
 		self.plaintext = plaintext
@@ -99,24 +105,22 @@ class WepEncryption():
 	def getCiphertext(self):
 		'''
 		Ritorna il plaintext criptato con wep
+		il ciphertext è una tupla
 		'''		
 		#definisco il cipher
 		cipher = arcFour(self.seed)
 		
-		#calcolo il crc32 del plaintext --> intero
-		crc32List  = self.crc32()
+		#calcolo il crc32 del plaintext --> tupla
+		crc32  = crc32Tuple(self.plaintext)
 
 		#appendo il crc32 al plaintext
-		plaintextList = list(self.plaintext)
-
-		#creo la tupla che va in xor con il keystream
-		plain = tuple(plaintextList+crc32List)
+		arc4Input = self.plaintext + crc32
 		
 		# faccio lo xor tra il risultato e il keystream
 		output = []
-		for i in range(len(plain)):
+		for i in range(len(arc4Input)):
 			keyStreamByte = cipher.getKeyStreamByte()	
-			outputBlock = plain[i] ^ keyStreamByte
+			outputBlock = arc4Input[i] ^ keyStreamByte
 			output.append(outputBlock)
 		return tuple(output)
 		

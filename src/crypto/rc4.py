@@ -18,7 +18,7 @@ class arcFour:
 	def __init__(self,key):
 		'''key è una tupla'''
 		self.key = key
-		#self.input = None
+		self.input = None
 		self.i = None
 		self.j = None
 		self.SBox = self.setSBox()
@@ -26,11 +26,12 @@ class arcFour:
 
 	
 
-	#def setInput(self,inputValue):
-	#	'''
-	#	Imposta l'input che dev'essere xorato con il keystream
-	#	'''
-	#	self.input = inputValue
+	def setInput(self,inputValue):
+		'''
+		NON USARE --> METODI USATI SOLO NEI TEST
+		Imposta l'input che dev'essere xorato con il keystream
+		'''
+		self.input = inputValue
 
 
 	
@@ -77,15 +78,16 @@ class arcFour:
 
 
 
-	#def getOutput(self):
-	#	'''
-	#	Ritorna l'output del cipher ottenuto facendo lo xor tra l'input e il keyStream
-	#	'''
-	#	output = []
-	#	for i in range(len(self.input)):
-	#		keyStreamByte = self.getKeyStreamByte()	
-	#		outputBlock = self.input[i] ^ keyStreamByte
-	#		output.append(outputBlock)
-	#	return tuple(output)
+	def getOutput(self):
+		'''
+		NON USARE --> METODI USATI SOLO NEI TEST
+		Ritorna l'output del cipher ottenuto facendo lo xor tra l'input e il keyStream
+		'''
+		output = []
+		for i in range(len(self.input)):
+			keyStreamByte = self.getKeyStreamByte()	
+			outputBlock = self.input[i] ^ keyStreamByte
+			output.append(outputBlock)
+		return tuple(output)
 
 
