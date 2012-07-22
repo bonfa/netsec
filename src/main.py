@@ -68,6 +68,7 @@ def printKeys(tk,authenticatorMicKey,supplicantMicKey):
 	print "tk = " + binascii.hexlify(tk)
 	print "authMICKey = " + binascii.hexlify(authenticatorMicKey)
 	print "supplMicKey = " + binascii.hexlify(supplicantMicKey)
+	print ""
 
 
 
@@ -110,10 +111,8 @@ try:
 	tk,authenticatorMicKey,supplicantMicKey = doFourWayHandshake(NomePacchetto1_4Way,NomePacchetto2_4Way,NomePacchetto3_4Way,NomePacchetto4_4Way,pms,ssid)
 	
 	#stampo le chiavi di sessione ottenute
-	#tk_rev = (tk[0:16])[::-1]
-	#tk = tk_rev
 	printKeys(tk,authenticatorMicKey,supplicantMicKey)
-	print ""
+
 	
 	# load session packets
 	criptedPacketList = loadSessionPacket(criptedPacketListName)
@@ -121,8 +120,8 @@ try:
 	# stampo i pacchetti con scapy
 	#criptedPacketList.show()
 	
-	# prendo il primo pacchetto che sicuramente è un pacchetto dati
-	dataPack = criptedPacketList[1]
+	# prendo il secondo pacchetto che sicuramente è un pacchetto dati
+	dataPack = criptedPacketList[4]
 	dataPack.show()	
 
 	

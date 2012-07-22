@@ -70,6 +70,7 @@ class FourWayHandshakeManager():
 		packet_list = [self.p2,self.p3,self.p4]
 		for packet in packet_list:
 			# prendo il pacchetto e ne calcolo il MIC
+			#print 'KEK = ' + str(struct.unpack('16B',self.kek))
 			micGen = cryptoManager(packet.pcapForm,packet.objectForm,self.kek,self.kck)
 			# ottengo il mic
 			mic_raw_data = micGen.getMicString()

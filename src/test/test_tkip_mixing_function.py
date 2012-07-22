@@ -278,6 +278,10 @@ class TestTkipEncryptionMixingFunction(unittest.TestCase):
 
 
 
+#	def test_tkip_my_MixingFunction(self):
+		
+
+
 if __name__ == '__main__':
 	suite = unittest.TestLoader().loadTestsFromTestCase(TestTkipEncryptionMixingFunction)
 	unittest.TextTestRunner(verbosity=2).run(suite)

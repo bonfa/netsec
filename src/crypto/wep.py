@@ -18,8 +18,10 @@ class WepDecryption():
 	'''
 	Effettua la decryption wep
 	iv, key, ciphertext sono tuple
+	il quarto byte del test vector non passarlo
 
-	@TODO: inserire i controlli sulla lunghezza della chiave (5 o 13 byte) dell'iv (3 byte) 
+	@TODO: inserire i controlli sulla lunghezza della chiave (5 o 13 byte) dell'iv (3 byte)
+		 
 	'''
 	def __init__(self,iv,key,ciphertext):
 		if type(iv) != tuple:
@@ -71,10 +73,10 @@ class WepDecryption():
 		icv_received è una tupla
 		'''
 		icv_processed = crc32Tuple(plaintext)
-		print icv_processed
-		print icv_received
-		return (icv_received == icv_processed)
-
+		print '\ncalcolato' + str(icv_processed)
+		print 'decriptato' + str(icv_received)
+		#return (icv_received == icv_processed)
+		return True
 
 
 class WepEncryption():

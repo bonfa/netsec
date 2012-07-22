@@ -19,6 +19,7 @@ class TKIPmixingFunction:
 
 	Implementazione della mixing function usata dal tkip per criptare
 	tk,ta,tsc sono stringhe
+	wepSeed è una tupla
 	'''
 	def __init__(self,tk,ta,tsc):
 		self.tk = tk
