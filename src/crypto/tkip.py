@@ -33,9 +33,88 @@ def getTSC(iv8String):
 
 
 
+class TkipDecryptor():
+	'''
+	Classe di alto livello che viene chiamata dal main
+	Prepara l'input nel formato giusto e chiama TKIP_Decryptor_Low con il nuovo input
+	@TODO: inserire controlli sulla lunghezza dell'input
+	packet è un pacchetto scapy
+	temporalKey, micKey sono stringhe		
+	'''
+	def __init__(self,packet,temporalKey,micKey):
+		self.packet = packet
+		self.temporalKey = temporalKey[:16]
+		self.micKey = micKey
+
+			
+
+	def getDecryptedPacket(self):	
+		'''
+		Ritorna l'mpdu decriptata
+		'''
+		#estraggo i valori dal pacchetto
+		ciphertext = self.getCipherText()
+		srcAddr = self.getSrcAddress()
+		iv8 = self.getIV()
+		temporalKey = self.temporalKey
+		micKey = self.micKey
+		#decripto
+		decryptor = TKIP_Decryptor_Low(ciphertext,srcAddr,iv8,temporalKey,micKey)	
+		plaintext = decryptor.decryptPayload()		
+		## non so se devo appenderci qualcosa
+
+
+
+	def getCipherText(self):
+		'''
+		Estrae dal pacchetto scapy la stringa del cipher_text e la ritorna
+		'''
+		icvStr = struct.pack('>I',self.packet.icv)
+		#print a
+		#print struct.unpack('>4B',a)
+		return self.packet.wepdata[4:] + icvStr
+	
+
+	
+	def getSrcAddress(self):
+		'''
+		Estrae dal pacchetto scapy la stringa del src_address e la ritorna
+		'''
+		macAddrScapy = str(self.packet.addr2)
+		macAddrTuple = (macAddrScapy).split(':')
+		macIntegerList = []
+		for i in range(len(macAddrTuple)):
+			macIntegerList.append(int(macAddrTuple[i],16))
+		#print macIntegerList
+		i1,i2,i3,i4,i5,i6 = macIntegerList
+		macAddrStr = struct.pack('6B',i1,i2,i3,i4,i5,i6)
+		#print ord(macAddrStr[0])
+		return macAddrStr
+	
+
+
+	def getIV(self):
+		'''
+		Estrae dal pacchetto scapy la stringa dell'IV e la ritorna
+		'''
+		# IV + extendedIV
+		#print struct.unpack('3B',self.packet.iv)
+		print struct.pack('1B',self.packet.keyid)
+		print (self.packet.wepdata[:4])
+		return self.packet.iv + struct.pack('1B',self.packet.keyid) + self.packet.wepdata[:4]
+		
+
+
+
 class TKIP_Decryptor_Low():
 	'''
+	Classe che si interfaccia con la classe WEP
+	Gli input di questa classe sono stringhe
 	srcAddr,iv,temporalKey,micKey sono stringhe
+	@TODO: inserire controlli sulla lunghezza dell'input
+	iv --> 8 byte
+	temporalKey --> 16B
+	micKey --> 
 	'''		
 	def __init__(self,ciphertext,srcAddr,iv,temporalKey,micKey):
 		self.ta = srcAddr
@@ -90,4 +169,14 @@ class TKIP_Decryptor_Low():
 		@TODO: implementare il metodo
 		'''
 		return True
+
+
+
+	def getMic(self):
+		'''
+		Ritorna il MIC del pacchetto
+		@TODO: implementare il metodo
+		'''
+
+
 	

@@ -75,8 +75,8 @@ class WepDecryption():
 		icv_processed = crc32Tuple(plaintext)
 		print '\ncalcolato' + str(icv_processed)
 		print 'decriptato' + str(icv_received)
-		#return (icv_received == icv_processed)
-		return True
+		return (icv_received == icv_processed)
+		#return True
 
 
 class WepEncryption():
