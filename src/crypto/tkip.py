@@ -43,7 +43,7 @@ class TkipDecryptor():
 	'''
 	def __init__(self,packet,temporalKey,micKey):
 		self.packet = packet
-		self.temporalKey = temporalKey[:16]
+		self.temporalKey = temporalKey
 		self.micKey = micKey
 
 			
@@ -70,8 +70,6 @@ class TkipDecryptor():
 		Estrae dal pacchetto scapy la stringa del cipher_text e la ritorna
 		'''
 		icvStr = struct.pack('>I',self.packet.icv)
-		#print a
-		#print struct.unpack('>4B',a)
 		return self.packet.wepdata[4:] + icvStr
 	
 
@@ -85,10 +83,8 @@ class TkipDecryptor():
 		macIntegerList = []
 		for i in range(len(macAddrTuple)):
 			macIntegerList.append(int(macAddrTuple[i],16))
-		#print macIntegerList
 		i1,i2,i3,i4,i5,i6 = macIntegerList
 		macAddrStr = struct.pack('6B',i1,i2,i3,i4,i5,i6)
-		#print ord(macAddrStr[0])
 		return macAddrStr
 	
 
@@ -98,9 +94,6 @@ class TkipDecryptor():
 		Estrae dal pacchetto scapy la stringa dell'IV e la ritorna
 		'''
 		# IV + extendedIV
-		#print struct.unpack('3B',self.packet.iv)
-		print struct.pack('1B',self.packet.keyid)
-		print (self.packet.wepdata[:4])
 		return self.packet.iv + struct.pack('1B',self.packet.keyid) + self.packet.wepdata[:4]
 		
 
@@ -127,23 +120,18 @@ class TKIP_Decryptor_Low():
 
 
 	def decryptPayload(self):
+		#printTKIP_parameters(self.tk,self.iv,self.ta,self.ciphertext)
 		# Creo la mixing function
 		mixingFunction = TKIPmixingFunction(self.tk,self.ta,self.tsc)
 		
 		# Calcolo il wep seed (tupla)
 		wepSeed = mixingFunction.getWepSeed()
-
-		# wepseed è giusto
-		print 'WEP SEED'			
-		wepHex = []
-		for i in range(len(wepSeed)):
-			wepHex.append(int(wepSeed[i]))
-		print wepHex
+		#printWepSeed(wepSeed)		
 	
 		# Passo da stringa a tupla
 		lunghezza = len(self.ciphertext)
-		stringa = str(lunghezza)+'B'
-		cipher_tuple = struct.unpack(stringa,self.ciphertext)
+		stringFormat = str(lunghezza)+'B'
+		cipher_tuple = struct.unpack(stringFormat,self.ciphertext)
 
 		ivTuple = ()
 
@@ -179,4 +167,17 @@ class TKIP_Decryptor_Low():
 		'''
 
 
-	
+
+def printTKIP_parameters(tk,iv,sa,ciphertext):
+	print 'SOURCE ADDRESS  = ' + str(struct.unpack('6B',sa[:]))
+	print 'IV  = ' + str(struct.unpack('8B',iv[:]))
+	print 'TK  = ' + str(struct.unpack('16B',(tk[:16])[:]))
+	print '\nCIPHERTEXT = ' + str(struct.unpack('72B',ciphertext[:]))
+
+
+def printWepSeed(wepSeed):
+	wepHex = []
+	for i in range(len(wepSeed)):
+		wepHex.append(int(wepSeed[i]))
+	print 'WEP SEED = ' + str(wepHex)
+

@@ -64,7 +64,8 @@ def printKeys(tk,authenticatorMicKey,supplicantMicKey):
 	'''
 	Stampa le chiavi di sessione ottenute dal 4 way handshake
 	'''
-	print "\n [KEYS]:"	
+	print "\n [KEYS]:"
+	print "tk = " + str(struct.unpack('16B',tk[:16]))
 	print "tk = " + binascii.hexlify(tk)
 	print "authMICKey = " + binascii.hexlify(authenticatorMicKey)
 	print "supplMicKey = " + binascii.hexlify(supplicantMicKey)
@@ -93,7 +94,7 @@ def getDecriptedPacket(criptedPacket,temporalKey,authenticatorMicKey,supplicantM
 
 
 #definisco le variabili principali
-path = '../pacchetti-catturati/'
+path = '../pacchetti-catturati/ultimo/'
 NomePacchetto1_4Way = path + 'four_way_1'
 NomePacchetto2_4Way = path + 'four_way_2'
 NomePacchetto3_4Way = path + 'four_way_3'
@@ -102,8 +103,8 @@ groupKeyHandshakeMsg1Name = path + 'group_key_1'
 groupKeyHandshakeMsg2Name = path + 'group_key_2'
 pms = 'H6x&@!1uLQ*()!12c0x\\f^\'?|s<SNgh-'
 ssid = 'WWWLAN'
-criptedPacketListName = path + 'ultimo/fish0all'
-clearPacketListName = path + 'ultimo/wlan0tcp80'
+criptedPacketListName = path + 'fish0all'
+clearPacketListName = path + 'wlan0tcp80'
 
 
 try:
@@ -122,14 +123,14 @@ try:
 	
 	# prendo il secondo pacchetto che sicuramente è un pacchetto dati
 	dataPack = criptedPacketList[4]
-	dataPack.show()	
+	#dataPack.show()	
 
 	
 	# provo a decriptarlo con le chiavi
 	decrypted = getDecriptedPacket(dataPack,tk,authenticatorMicKey,supplicantMicKey)
 
 	#stampo il pacchetto decriptato
-	print "\n\n"
+	
 	decrypted.show()	
 	
 
@@ -139,7 +140,7 @@ except PacketError as (error,mex):
 	print 'ERRORS in input packets'
 	print mex
 	print 'closing program'
-
+	
 
 
 

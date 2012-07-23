@@ -261,6 +261,7 @@ class TestWEP(unittest.TestCase):
 		processedResult = encrypted
 		expectedResult = ciphertext[32:]
 		self.assertEqual(processedResult,expectedResult)
+
 	
 
 
