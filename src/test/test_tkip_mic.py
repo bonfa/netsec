@@ -12,7 +12,7 @@ import struct
 
 class TestTkipMicGenerator(unittest.TestCase):
 	'''
-	Casi di test per le operazioni definite nel modulo four_way_crypto_utility
+	Casi di test per le operazioni definite nel modulo tkip_mic_utility
 	'''
 
 
@@ -191,6 +191,20 @@ class TestTkipMicGenerator(unittest.TestCase):
 		processedMic = micGen.getMic()
 		self.assertEqual(correctMic,processedMic)
 	
+
+
+	def test_michael_6_b(self):
+		'''
+		Test dell'algoritmo di michael implementato dalla classe TkipMicGenerator per generare il MIC TKIP.
+		Cambio il formato dell'input
+		Test 6 a pagina 1119 della rfc
+		'''
+		key = struct.pack('8B',0xD5,0x5e,0x10,0x05,0x10,0x12,0x89,0x86)
+		mex = "Michael"
+		correctMic = struct.pack('8B',0x0a,0x94,0x2b,0x12,0x4e,0xca,0xa5,0x46)
+		micGen = TkipMicGenerator(mex,key)
+		processedMic = micGen.getMic()
+		self.assertEqual(correctMic,processedMic)
 
 
 if __name__ == '__main__':

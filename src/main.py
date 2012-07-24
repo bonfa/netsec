@@ -87,10 +87,34 @@ def getDecriptedPacket(criptedPacket,temporalKey,authenticatorMicKey,supplicantM
 	'''
 	Prende in ingresso un pacchetto criptato e lo decripta
 	'''
-	decryptor = TkipDecryptor(criptedPacket,temporalKey,authenticatorMicKey)
+	micKey = getProperMicKey(criptedPacket,authenticatorMicKey,supplicantMicKey)
+	decryptor = TkipDecryptor(criptedPacket,temporalKey,micKey)
 	plaintext = decryptor.getDecryptedPacket()
 	return plaintext	
 	
+
+def getProperMicKey(packet,authenticatorMicKey,supplicantMicKey):
+	'''
+	Ritorna la chiave corretta per il calcolo del mic in funzione del mittente del pacchetto
+	'''
+	trasmitterMacAddressTuple = getSrcAddress(packet)
+	if (trasmitterMacAddressTuple == authenticatorAddressTuple):
+		return authenticatorMicKey
+	else:	
+		return supplicantMicKey
+
+
+def getSrcAddress(packet):
+	'''
+	Estrae dal pacchetto scapy la stringa del src_address e ritorna la tupla
+	'''
+	macAddrScapy = str(packet.addr2)
+	macAddrTuple = (macAddrScapy).split(':')
+	macIntegerList = []
+	for i in range(len(macAddrTuple)):
+		macIntegerList.append(int(macAddrTuple[i],16))
+	i1,i2,i3,i4,i5,i6 = macIntegerList
+	return (i1,i2,i3,i4,i5,i6)
 
 
 #definisco le variabili principali
@@ -99,12 +123,14 @@ NomePacchetto1_4Way = path + 'four_way_1'
 NomePacchetto2_4Way = path + 'four_way_2'
 NomePacchetto3_4Way = path + 'four_way_3'
 NomePacchetto4_4Way = path + 'four_way_4'
-groupKeyHandshakeMsg1Name = path + 'group_key_1'
-groupKeyHandshakeMsg2Name = path + 'group_key_2'
+#groupKeyHandshakeMsg1Name = path + 'group_key_1'
+#groupKeyHandshakeMsg2Name = path + 'group_key_2'
 pms = 'H6x&@!1uLQ*()!12c0x\\f^\'?|s<SNgh-'
 ssid = 'WWWLAN'
 criptedPacketListName = path + 'fish0all'
 clearPacketListName = path + 'wlan0tcp80'
+authenticatorAddressTuple = (0x00,0x18,0xe7,0x45,0x0e,0x22)
+
 
 
 try:
@@ -123,7 +149,7 @@ try:
 	
 	# prendo il secondo pacchetto che sicuramente è un pacchetto dati
 	dataPack = criptedPacketList[4]
-	#dataPack.show()	
+	dataPack.show()	
 
 	
 	# provo a decriptarlo con le chiavi

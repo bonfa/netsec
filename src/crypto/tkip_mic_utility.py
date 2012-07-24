@@ -18,6 +18,7 @@ class TkipMicGenerator:
 	Classe TkipMicGenerator
 
 	Calcola il MIC con chiave K del messaggio in ingresso
+	mex e key sono stringhe
 	'''
 	def __init__(self,mex,key):
 		self.keyLenght = 8

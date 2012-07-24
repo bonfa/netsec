@@ -14,7 +14,7 @@ from exception import TKIPError
 import struct
 import binascii
 from wep import WepDecryption
-
+from tkip_mic_utility import TkipMicGenerator
 
 
 def getTSC(iv8String):
@@ -62,7 +62,7 @@ class TkipDecryptor():
 		decryptor = TKIP_Decryptor_Low(ciphertext,srcAddr,iv8,temporalKey,micKey)	
 		plaintext = decryptor.decryptPayload()		
 		## non so se devo appenderci qualcosa
-
+		return plaintext
 
 
 	def getCipherText(self):
@@ -108,8 +108,13 @@ class TKIP_Decryptor_Low():
 	iv --> 8 byte
 	temporalKey --> 16B
 	micKey --> 
+		
 	'''		
-	def __init__(self,ciphertext,srcAddr,iv,temporalKey,micKey):
+	def __init__(self,ciphertext,srcAddr,iv,temporalKey,micKey,dstAddr,priorityField):
+		self.da = dstAddr
+		self.priority = priorityField
+		reservedTuple = (0x00,0x00)*12
+		self.reserved = struct.pack('24B',*reservedTuple)
 		self.ta = srcAddr
 		self.tsc = getTSC(iv)
 		self.iv = iv
@@ -138,33 +143,74 @@ class TKIP_Decryptor_Low():
 		# Decripto la tupla
 		decryptor = WepDecryption(ivTuple,wepSeed,cipher_tuple)	
 			
-		# Estraggo il plainText	
-		plainText = decryptor.getPlaintextAndIcv()
+		# Estraggo il plaintext --> tupla
+		plaintextAndIcv = decryptor.getPlaintextAndIcv()
 
 		# Controllo il MIC
-		if self.checkMic():
+		if self.checkMic(plaintextAndIcv[:-4]):
 			# ritorno il plaintext
-			return plainText
+			return plaintextAndIcv
 		else:
 			#errore MIC
 			raise TKIPError('checkMic()','MIC does not match')
 	
 
 	
-	def checkMic(self):
+	def checkMic(self,plaintextAndMic):
 		'''
 		Controllo che il mic calcolato sia uguale al mic generato
-		@TODO: implementare il metodo
+		Ho il plaintextAndMic --> tupla
+		Devo passare a stringa
 		'''
-		return True
+		#il mic sono gli ultimi 8 byte del pacchetto ricevuto
+		micReceived = plaintextAndMic[-8:]
+		incompletePlaintext = plaintextAndMic[:-8]
+		micProcessed = self.getMic(incompletePlaintext)
+
+		print len(micProcessed)
+		print 'RECEIVED = ' + str(micReceived)
+		print 'PROCESSED = ' + str(struct.unpack('8B',micProcessed))
+		return (micReceived == micProcessed)
 
 
 
-	def getMic(self):
+	def getMic(self,incompletePlaintext):
 		'''
 		Ritorna il MIC del pacchetto
-		@TODO: implementare il metodo
+		Ho il plaintext incompleto --> tupla
 		'''
+		# trasformo la tupla in stringa
+		formatStr = str(len(incompletePlaintext))+'B'
+		incompletePlaintextStr = struct.pack(formatStr,*incompletePlaintext)
+		#preparo il pacchetto per il calcolo del MIC
+		plaintextStrForMic = self.getPlaintextForMic(incompletePlaintextStr)
+		#ritorna il mic
+		micGen = TkipMicGenerator(plaintextStrForMic,self.micKey)
+		print 'PLAINTEXT_FOR_MIC = ' + plaintextStrForMic
+		return micGen.getMic()
+
+
+
+	def getPlaintextForMic(self,incompletePlaintext):
+		'''
+		Prende il pacchetto e gli appende destination address, source address, priority field e reserved bytes
+		incompletePlaintext --> tupla
+		return --> tupla
+		'''
+		# Concateno i campi in ordine
+		print 'SA = ' + str(struct.unpack('6B',self.da))
+		print 'DA = ' + str(struct.unpack('6B',self.ta))
+		print 'PRIO = ' + str(struct.unpack('1B',self.priority)[0])
+		
+		completePlaintext = self.da + self.ta + self.priority + self.reserved + incompletePlaintext
+
+		#debug
+		formatStr = str(len(incompletePlaintext))+'B'
+		print 'INC = ' + str(struct.unpack(formatStr,incompletePlaintext))
+		formatStr = str(len(completePlaintext))+'B'
+		print 'COMPL = ' + str(struct.unpack(formatStr,completePlaintext))
+
+		return completePlaintext
 
 
 
