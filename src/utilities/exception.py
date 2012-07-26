@@ -113,5 +113,27 @@ class TKIPError(Error):
 		self.msg = msg
 
 
+class MacError(Error):
+	"""Exception raised when there are some errors with the mac address
 
+	Attributes:
+		expr -- input expression in which the error occurred
+		msg  -- explanation of the error
+	"""
+	def __init__(self, expr, msg):
+		self.expr = expr
+		self.msg = msg
+
+
+
+class FlagException(Error):
+	"""Exception raised when there are some errors with the mac address
+
+	Attributes:
+		expr -- input expression in which the error occurred
+		msg  -- explanation of the error
+	"""
+	def __init__(self, expr, msg):
+		self.expr = expr
+		self.msg = msg
 

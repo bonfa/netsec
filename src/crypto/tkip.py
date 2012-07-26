@@ -10,7 +10,7 @@ import sys
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
 sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/utilities')
 from tkip_functions import TKIPmixingFunction
-from exception import TKIPError
+from exception import TKIPError,FlagException
 import struct
 import binascii
 from wep import WepDecryption
@@ -60,11 +60,13 @@ class TkipDecryptor():
 		micKey = self.micKey
 		dstAddr = self.getDstAddress()
 		priorityField = self.getPriorityField()
+		transmAddr = self.getTransmissionAddress()
 		#decripto
-		decryptor = TKIP_Decryptor_Low(ciphertext,srcAddr,iv8,temporalKey,micKey,dstAddr,priorityField)	
+		decryptor = TKIP_Decryptor_Low(ciphertext,srcAddr,dstAddr,transmAddr,iv8,temporalKey,micKey,priorityField)	
 		plaintext = decryptor.decryptPayload()		
 		## non so se devo appenderci qualcosa
 		return plaintext
+
 
 
 	def getCipherText(self):
@@ -80,22 +82,48 @@ class TkipDecryptor():
 		'''
 		Estrae dal pacchetto scapy la stringa del src_address e la ritorna
 		'''
-		macAddrScapy = str(self.packet.addr2)
-		macAddrTuple = (macAddrScapy).split(':')
-		macIntegerList = []
-		for i in range(len(macAddrTuple)):
-			macIntegerList.append(int(macAddrTuple[i],16))
-		i1,i2,i3,i4,i5,i6 = macIntegerList
-		macAddrStr = struct.pack('6B',i1,i2,i3,i4,i5,i6)
-		return macAddrStr
+		toDsFromDs = self.packet.FCfield & 0x3
+		if toDsFromDs==0 or toDsFromDs==2:
+			macAddrScapy = str(self.packet.addr2)
+		elif toDsFromDs==1:
+			macAddrScapy = str(self.packet.addr3)
+		elif toDsFromDs==3:
+			macAddrScapy = str(self.packet.addr4)
+		else:
+			raise FlagException('toDsFromDs not in (0,1,2,3)','Error in flags')
+		return self.getAddrStr(macAddrScapy)
 	
+
+
+	def getTransmissionAddress(self):
+		'''
+		Estrae dal pacchetto scapy la stringa del src_address e la ritorna
+		'''
+		toDsFromDs = self.packet.FCfield & 0x3
+		macAddrScapy = str(self.packet.addr2)
+		return self.getAddrStr(macAddrScapy)
+
 
 
 	def getDstAddress(self):
 		'''
 		Estrae dal pacchetto scapy la stringa del dst_address e la ritorna
 		'''
-		macAddrScapy = str(self.packet.addr1)
+		toDsFromDs = self.packet.FCfield & 0x3
+		if toDsFromDs==0 or toDsFromDs==1:
+			macAddrScapy = str(self.packet.addr1)
+		elif toDsFromDs==2 or toDsFromDs==3:
+			macAddrScapy = str(self.packet.addr3)
+		else:
+			raise FlagException('toDsFromDs not in (0,1,2,3)','Error in flags')
+		return self.getAddrStr(macAddrScapy)
+
+
+
+	def getAddrStr(self,macAddrScapy):
+		'''
+		Riceve in input un indirizzo scapy e torna la stringa corrispondente
+		'''
 		macAddrTuple = (macAddrScapy).split(':')
 		macIntegerList = []
 		for i in range(len(macAddrTuple)):
@@ -103,6 +131,7 @@ class TkipDecryptor():
 		i1,i2,i3,i4,i5,i6 = macIntegerList
 		macAddrStr = struct.pack('6B',i1,i2,i3,i4,i5,i6)
 		return macAddrStr
+
 
 
 	def getPriorityField(self):
@@ -134,17 +163,18 @@ class TKIP_Decryptor_Low():
 	micKey --> 
 		
 	'''		
-	def __init__(self,ciphertext,srcAddr,iv,temporalKey,micKey,dstAddr,priorityField = None):
+	def __init__(self,ciphertext,srcAddr,dstAddr,trasmAddr,iv,temporalKey,micKey,priorityField = chr(0)):
+		self.ciphertext = ciphertext
+		self.sa = srcAddr
 		self.da = dstAddr
-		self.priority = priorityField
-		self.reserved = 3*chr(0)
-		self.ta = srcAddr
-		self.tsc = getTSC(iv)
+		self.ta = trasmAddr
 		self.iv = iv
 		self.tk = temporalKey
-		self.micKey = micKey
-		self.ciphertext = ciphertext
-
+		self.micKey = micKey		
+		self.priority = priorityField
+		self.reserved = 3*chr(0)
+		self.tsc = getTSC(iv)
+		
 
 
 	def decryptPayload(self):
@@ -232,9 +262,9 @@ class TKIP_Decryptor_Low():
 		#print 'PRIO = ' + str(struct.unpack('1B',self.priority)[0])
 		
 		if (self.priority == None):
-			paddedMSDU = self.da + self.ta + msdu
+			paddedMSDU = self.da + self.sa + msdu
 		else:
-			paddedMSDU = self.da + self.ta + self.priority + self.reserved + msdu
+			paddedMSDU = self.da + self.sa + self.priority + self.reserved + msdu
 
 		#debug
 		formatStr = str(len(msdu))+'B'
