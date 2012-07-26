@@ -58,8 +58,10 @@ class TkipDecryptor():
 		iv8 = self.getIV()
 		temporalKey = self.temporalKey
 		micKey = self.micKey
+		dstAddr = self.getDstAddress()
+		priorityField = self.getPriorityField()
 		#decripto
-		decryptor = TKIP_Decryptor_Low(ciphertext,srcAddr,iv8,temporalKey,micKey)	
+		decryptor = TKIP_Decryptor_Low(ciphertext,srcAddr,iv8,temporalKey,micKey,dstAddr,priorityField)	
 		plaintext = decryptor.decryptPayload()		
 		## non so se devo appenderci qualcosa
 		return plaintext
@@ -89,6 +91,28 @@ class TkipDecryptor():
 	
 
 
+	def getDstAddress(self):
+		'''
+		Estrae dal pacchetto scapy la stringa del dst_address e la ritorna
+		'''
+		macAddrScapy = str(self.packet.addr1)
+		macAddrTuple = (macAddrScapy).split(':')
+		macIntegerList = []
+		for i in range(len(macAddrTuple)):
+			macIntegerList.append(int(macAddrTuple[i],16))
+		i1,i2,i3,i4,i5,i6 = macIntegerList
+		macAddrStr = struct.pack('6B',i1,i2,i3,i4,i5,i6)
+		return macAddrStr
+
+
+	def getPriorityField(self):
+		'''
+		Ritorna il priority field del pacchetto
+		@TODO: tornare un valore diverso nel caso di QoS non nullo
+		'''
+		return chr(0)
+
+
 	def getIV(self):
 		'''
 		Estrae dal pacchetto scapy la stringa dell'IV e la ritorna
@@ -110,11 +134,10 @@ class TKIP_Decryptor_Low():
 	micKey --> 
 		
 	'''		
-	def __init__(self,ciphertext,srcAddr,iv,temporalKey,micKey,dstAddr,priorityField):
+	def __init__(self,ciphertext,srcAddr,iv,temporalKey,micKey,dstAddr,priorityField = None):
 		self.da = dstAddr
 		self.priority = priorityField
-		reservedTuple = (0x00,0x00)*12
-		self.reserved = struct.pack('24B',*reservedTuple)
+		self.reserved = 3*chr(0)
 		self.ta = srcAddr
 		self.tsc = getTSC(iv)
 		self.iv = iv
@@ -145,7 +168,9 @@ class TKIP_Decryptor_Low():
 			
 		# Estraggo il plaintext --> tupla
 		plaintextAndIcv = decryptor.getPlaintextAndIcv()
-
+		
+		print 'PLAINTEXT = ' + str(plaintextAndIcv)
+	
 		# Controllo il MIC
 		if self.checkMic(plaintextAndIcv[:-4]):
 			# ritorno il plaintext
@@ -163,54 +188,61 @@ class TKIP_Decryptor_Low():
 		Devo passare a stringa
 		'''
 		#il mic sono gli ultimi 8 byte del pacchetto ricevuto
-		micReceived = plaintextAndMic[-8:]
-		incompletePlaintext = plaintextAndMic[:-8]
-		micProcessed = self.getMic(incompletePlaintext)
+		micReceivedTuple = plaintextAndMic[-8:]
+		msduNoMic = plaintextAndMic[:-8]
+		micProcessed = self.getMic(msduNoMic)
+		
 
-		print len(micProcessed)
-		print 'RECEIVED = ' + str(micReceived)
-		print 'PROCESSED = ' + str(struct.unpack('8B',micProcessed))
-		return (micReceived == micProcessed)
+		#print len(micProcessed)
+		print '   RECEIVED = ' + str(micReceivedTuple)
+		print '   PROCESSED = ' + str(struct.unpack('8B',micProcessed))
+		return (micReceivedTuple == struct.unpack('8B',micProcessed))
 
 
 
-	def getMic(self,incompletePlaintext):
+	def getMic(self,msduNoMic):
 		'''
 		Ritorna il MIC del pacchetto
 		Ho il plaintext incompleto --> tupla
 		'''
 		# trasformo la tupla in stringa
-		formatStr = str(len(incompletePlaintext))+'B'
-		incompletePlaintextStr = struct.pack(formatStr,*incompletePlaintext)
+		formatStr = str(len(msduNoMic))+'B'
+		msduNoMicStr = struct.pack(formatStr,*msduNoMic)
 		#preparo il pacchetto per il calcolo del MIC
-		plaintextStrForMic = self.getPlaintextForMic(incompletePlaintextStr)
+		paddedMSDU = self.getPaddedMSDU(msduNoMicStr)
 		#ritorna il mic
-		micGen = TkipMicGenerator(plaintextStrForMic,self.micKey)
-		print 'PLAINTEXT_FOR_MIC = ' + plaintextStrForMic
+		#print 'LUNGH = ' + str(len(paddedMSDU))
+		formatStr = str(len(paddedMSDU))+'B'
+		paddedMSDUTuple = struct.unpack(formatStr,paddedMSDU)	
+		#print 'PLAINTEXT_FOR_MIC = ' + str(paddedMSDUTuple)
+		micGen = TkipMicGenerator(paddedMSDU,self.micKey)
 		return micGen.getMic()
 
 
 
-	def getPlaintextForMic(self,incompletePlaintext):
+	def getPaddedMSDU(self,msdu):
 		'''
 		Prende il pacchetto e gli appende destination address, source address, priority field e reserved bytes
-		incompletePlaintext --> tupla
+		msdu --> tupla
 		return --> tupla
 		'''
 		# Concateno i campi in ordine
-		print 'SA = ' + str(struct.unpack('6B',self.da))
-		print 'DA = ' + str(struct.unpack('6B',self.ta))
-		print 'PRIO = ' + str(struct.unpack('1B',self.priority)[0])
+		#print 'DA = ' + str(struct.unpack('6B',self.da))
+		#print 'TA = ' + str(struct.unpack('6B',self.ta))
+		#print 'PRIO = ' + str(struct.unpack('1B',self.priority)[0])
 		
-		completePlaintext = self.da + self.ta + self.priority + self.reserved + incompletePlaintext
+		if (self.priority == None):
+			paddedMSDU = self.da + self.ta + msdu
+		else:
+			paddedMSDU = self.da + self.ta + self.priority + self.reserved + msdu
 
 		#debug
-		formatStr = str(len(incompletePlaintext))+'B'
-		print 'INC = ' + str(struct.unpack(formatStr,incompletePlaintext))
-		formatStr = str(len(completePlaintext))+'B'
-		print 'COMPL = ' + str(struct.unpack(formatStr,completePlaintext))
+		formatStr = str(len(msdu))+'B'
+		#print 'INC = ' + str(struct.unpack(formatStr,msdu))
+		formatStr = str(len(paddedMSDU))+'B'
+		#print 'COMPL = ' + str(struct.unpack(formatStr,paddedMSDU))
 
-		return completePlaintext
+		return paddedMSDU
 
 
 

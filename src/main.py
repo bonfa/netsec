@@ -23,7 +23,7 @@ from packet_printer import stringInHex
 from packet_subfields import getEapolKeyPart,printPacket
 from four_way_handshake import FourWayHandshakeManager
 import binascii
-from exception import PacketError
+from exception import PacketError,TKIPError
 from tkip import TkipDecryptor
 
 
@@ -148,16 +148,25 @@ try:
 	#criptedPacketList.show()
 	
 	# prendo il secondo pacchetto che sicuramente è un pacchetto dati
-	dataPack = criptedPacketList[4]
-	dataPack.show()	
+	indexListFrom_1 = (2,3)
+	#indexListFrom_1 = (2,3,5,11,12,14,15,17,18,20,21,23,24,26,28,29,30)
+	indexListFrom_0 = []
+	for i in range(len(indexListFrom_1)):
+		indexListFrom_0.append(indexListFrom_1[i] - 1)
 
-	
-	# provo a decriptarlo con le chiavi
-	decrypted = getDecriptedPacket(dataPack,tk,authenticatorMicKey,supplicantMicKey)
+	for i in indexListFrom_0:
+		try:
+			dataPack = criptedPacketList[i]
+			#dataPack.show()	
+			# provo a decriptarlo con le chiavi
+			decrypted = getDecriptedPacket(dataPack,tk,authenticatorMicKey,supplicantMicKey)
+			print "TKIP MIC OK"
+		except TKIPError:
+			print "TKIP MIC ERROR"
 
 	#stampo il pacchetto decriptato
-	
-	decrypted.show()	
+	print "END"
+	#decrypted.show()	
 	
 
 
