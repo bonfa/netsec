@@ -159,7 +159,7 @@ try:
 			dataPack = criptedPacketList[i]
 			#dataPack.show()	
 			# provo a decriptarlo con le chiavi
-			decrypted = getDecriptedPacket(dataPack,tk,authenticatorMicKey,supplicantMicKey)
+			decrypted = getDecriptedPacket(dataPack[i],tk,authenticatorMicKey,supplicantMicKey)
 			print "TKIP MIC OK"
 		except TKIPError:
 			print "TKIP MIC ERROR"
