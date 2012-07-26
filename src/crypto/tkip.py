@@ -99,7 +99,6 @@ class TkipDecryptor():
 		'''
 		Estrae dal pacchetto scapy la stringa del src_address e la ritorna
 		'''
-		toDsFromDs = self.packet.FCfield & 0x3
 		macAddrScapy = str(self.packet.addr2)
 		return self.getAddrStr(macAddrScapy)
 
@@ -163,7 +162,7 @@ class TKIP_Decryptor_Low():
 	micKey --> 
 		
 	'''		
-	def __init__(self,ciphertext,srcAddr,dstAddr,trasmAddr,iv,temporalKey,micKey,priorityField = chr(0)):
+	def __init__(self,ciphertext,srcAddr,dstAddr,trasmAddr,iv,temporalKey,micKey,priorityField):
 		self.ciphertext = ciphertext
 		self.sa = srcAddr
 		self.da = dstAddr

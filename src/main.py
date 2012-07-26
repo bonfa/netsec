@@ -158,7 +158,7 @@ class Main():
 		#for i in indexListFrom_0:
 		try:
 			#print i
-			dataPack = criptedPacketList[10]
+			dataPack = criptedPacketList[13]
 			dataPack.show()	
 			# provo a decriptarlo con le chiavi
 			decrypted = self.getDecriptedPacket(dataPack,tk,authenticatorMicKey,supplicantMicKey)
