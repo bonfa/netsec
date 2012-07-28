@@ -23,6 +23,7 @@ from wpa_struct_for_scapy import *
 from packet_printer import stringInHex
 from packet_subfields import getEapolKeyPart,printPacket
 from four_way_handshake import FourWayHandshakeManager
+from four_way_handshake_v2 import FourWayHandshakeManagerWithScapyOnly
 import binascii
 from exception import PacketError,TKIPError,MacError
 from tkip import TkipDecryptor
@@ -68,9 +69,15 @@ class Main():
 	def doFourWayHandshake(self,NomePacchetto1_4Way,NomePacchetto2_4Way,NomePacchetto3_4Way,NomePacchetto4_4Way,pms,ssid):
 		'''
 		Effettua tutte le operazioni in ordine del fourwayhandshake
-		'''		
-		#definisco l'oggetto che si occupa di caricare i pacchetti del fourwayhandshake e creare le chiavi
-		fourWayManager = FourWayHandshakeManager(NomePacchetto1_4Way,NomePacchetto2_4Way,NomePacchetto3_4Way,NomePacchetto4_4Way,pms,ssid)
+		'''
+		#carico il pacchetto 1 del 4way
+		packet = self.loadSessionPacket(self.NomePacchetto1_4Way)[0]
+		if packet.payload.name == '802.11':		
+			#definisco l'oggetto che si occupa di caricare i pacchetti del fourwayhandshake e creare le chiavi
+			fourWayManager = FourWayHandshakeManagerWithScapyOnly(NomePacchetto1_4Way,NomePacchetto2_4Way,NomePacchetto3_4Way,NomePacchetto4_4Way,pms,ssid)		
+		else:
+			#definisco l'oggetto che si occupa di caricare i pacchetti del fourwayhandshake e creare le chiavi
+			fourWayManager = FourWayHandshakeManager(NomePacchetto1_4Way,NomePacchetto2_4Way,NomePacchetto3_4Way,NomePacchetto4_4Way,pms,ssid)
 		#controlla i mac_address
 		fourWayManager.checkMacAddresses()
 		#controlla i mic
@@ -211,7 +218,7 @@ class Main():
 		# 4 way handshake	
 		tk,authenticatorMicKey,supplicantMicKey = self.doFourWayHandshake(self.NomePacchetto1_4Way,self.NomePacchetto2_4Way,self.NomePacchetto3_4Way,self.NomePacchetto4_4Way,self.pms,self.ssid)
 		
-		#self.printKeys(tk,authenticatorMicKey,supplicantMicKey)
+		self.printKeys(tk,authenticatorMicKey,supplicantMicKey)
 
 		# load session packets
 		criptedPacketList = self.loadSessionPacket(self.criptedPacketListName)
@@ -231,7 +238,7 @@ class Main():
 				nonDecriptati = nonDecriptati + 1 
 
 		# salvo la lista di pacchetti decriptati in un file pcap
-		wrpcap(self.criptedPacketListName+'-dec.pcap',decryptedList)
+		wrpcap(self.criptedPacketListName[:-5]+'-dec.pcap',decryptedList)
 		
 		# stampo un breve report
 		print "[RESULTS]"
@@ -242,7 +249,6 @@ class Main():
 
 
 if __name__ == '__main__':
-	print len(sys.argv)	
 	if len(sys.argv) != 8:
 		print "Wrong parameters number"
 		print "Input parameters must be as follows:"
