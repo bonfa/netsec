@@ -238,7 +238,8 @@ class Main():
 				nonDecriptati = nonDecriptati + 1 
 
 		# salvo la lista di pacchetti decriptati in un file pcap
-		wrpcap(self.criptedPacketListName[:-5]+'-dec.pcap',decryptedList)
+		if len(decryptedList)!= 0:
+			wrpcap(self.criptedPacketListName[:-5]+'-dec.pcap',decryptedList)
 		
 		# stampo un breve report
 		print "[RESULTS]"
