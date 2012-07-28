@@ -99,12 +99,11 @@ class FourWayHandshakeManager():
 		pskGenerator = passphraseToPSKMap(self.pms,self.ssid)
 		psk = pskGenerator.getPsk()
 
-		print 'PMK = ' + str(packet_printer.stringInHex(psk))
+		#print 'PMK = ' + str(packet_printer.stringInHex(psk))
 		#estraggo i due Nonce e i due macAddress
 		ANonce = self.p1.objectForm.payload.payload.key_nonce
 		SNonce = self.p2.objectForm.payload.payload.key_nonce
 		AA = self.p1.objectForm.header.source_address
-		print 'non = ' + str(struct.unpack('32B',ANonce))
 		SPA = self.p1.objectForm.header.destination_address
 
 		#genero le chiavi di sessione

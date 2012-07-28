@@ -79,7 +79,7 @@ class TkipDecryptor():
 		plaintext --> tupla
 		'''
 		if plaintext[0] != 170:
-			raise packetNotManagedError('Preamble != 0xAA-AA-03','Not managed type')
+			raise TKIPError('Preamble != 0xAA-AA-03','Packet kind decryption not managed')
 		else:
 			ethField = Ether()
 			ethField.dst = self.getSrcAddress()
@@ -113,7 +113,7 @@ class TkipDecryptor():
 		elif toDsFromDs==3:
 			macAddrScapy = str(self.packet.addr4)
 		else:
-			raise FlagException('toDsFromDs not in (0,1,2,3)','Error in flags')
+			raise TKIPError('toDsFromDs not in (0,1,2,3)','Error in flags')
 		return self.getAddrStr(macAddrScapy)
 	
 
@@ -137,7 +137,7 @@ class TkipDecryptor():
 		elif toDsFromDs==1 or toDsFromDs==3:
 			macAddrScapy = str(self.packet.addr3)
 		else:
-			raise FlagException('toDsFromDs not in (0,1,2,3)','Error in flags')
+			raise TKIPError('toDsFromDs not in (0,1,2,3)','Error in flags')
 		return self.getAddrStr(macAddrScapy)
 
 
@@ -182,8 +182,7 @@ class TKIP_Decryptor_Low():
 	@TODO: inserire controlli sulla lunghezza dell'input
 	iv --> 8 byte
 	temporalKey --> 16B
-	micKey --> 
-		
+	micKey --> 	
 	'''		
 	def __init__(self,ciphertext,srcAddr,dstAddr,trasmAddr,iv,temporalKey,micKey,priorityField):
 		self.ciphertext = ciphertext
