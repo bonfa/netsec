@@ -50,7 +50,7 @@ class TkipDecryptor():
 
 	def getDecryptedPacket(self):	
 		'''
-		Ritorna l'mpdu decriptata
+		Ritorna un pacchetto radiotap + 802.11 + mpdu decriptata
 		'''
 		#estraggo i valori dal pacchetto
 		ciphertext = self.getCipherText()
@@ -62,10 +62,33 @@ class TkipDecryptor():
 		priorityField = self.getPriorityField()
 		transmAddr = self.getTransmissionAddress()
 		#decripto
-		decryptor = TKIP_Decryptor_Low(ciphertext,srcAddr,dstAddr,transmAddr,iv8,temporalKey,micKey,priorityField)	
-		plaintext = decryptor.decryptPayload()		
-		## non so se devo appenderci qualcosa
-		return plaintext
+		decryptor = TKIP_Decryptor_Low(ciphertext,srcAddr,dstAddr,transmAddr,iv8,temporalKey,micKey,priorityField)
+		plaintextAndMic = decryptor.decryptPayload()		
+		#prendo il plaintext --> tupla
+		plaintextTuple = plaintextAndMic[:-8]
+
+		#creo un pacchetto radiotap + 802.11 + payload decriptato
+		newPack = self.appendPayload(plaintextTuple)
+		return newPack
+
+
+
+	def appendPayload(self,plaintext):
+		'''
+		prende il pacchetto 802.11 e crea un pacchetto EtherII con payload il plaintext privato dell'header LLC
+		plaintext --> tupla
+		'''
+		if plaintext[0] != 170:
+			raise packetNotManagedError('Preamble != 0xAA-AA-03','Not managed type')
+		else:
+			ethField = Ether()
+			ethField.dst = self.getSrcAddress()
+			ethField.src = self.getDstAddress()
+			ethField.type = plaintext[6]*16*16+plaintext[7]
+			pl = plaintext[8:]
+			ethFieldStr = str(ethField)
+			ethField = Ether(ethFieldStr+struct.pack(str(len(pl))+'B',*pl))
+		return ethField
 
 
 
@@ -198,7 +221,7 @@ class TKIP_Decryptor_Low():
 		# Estraggo il plaintext --> tupla
 		plaintextAndIcv = decryptor.getPlaintextAndIcv()
 		
-		print 'PLAINTEXT = ' + str(plaintextAndIcv)
+		#print 'PLAINTEXT = ' + str(plaintextAndIcv)
 	
 		# Controllo il MIC
 		if self.checkMic(plaintextAndIcv[:-4]):
@@ -222,8 +245,8 @@ class TKIP_Decryptor_Low():
 		micProcessed = self.getMic(msduNoMic)
 
 		#print len(micProcessed)
-		print '   RECEIVED = ' + str(micReceivedTuple)
-		print '   PROCESSED = ' + str(struct.unpack('8B',micProcessed))
+		#print '   RECEIVED = ' + str(micReceivedTuple)
+		#print '   PROCESSED = ' + str(struct.unpack('8B',micProcessed))
 		return (micReceivedTuple == struct.unpack('8B',micProcessed))
 
 
@@ -256,9 +279,9 @@ class TKIP_Decryptor_Low():
 		return --> tupla
 		'''
 		# Concateno i campi in ordine
-		print 'SA = ' + str(struct.unpack('6B',self.sa))
-		print 'DA = ' + str(struct.unpack('6B',self.da))
-		print 'TA = ' + str(struct.unpack('6B',self.ta))
+		#print 'SA = ' + str(struct.unpack('6B',self.sa))
+		#print 'DA = ' + str(struct.unpack('6B',self.da))
+		#print 'TA = ' + str(struct.unpack('6B',self.ta))
 		#print 'PRIO = ' + str(struct.unpack('1B',self.priority)[0])
 		
 		if (self.priority == None):

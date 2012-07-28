@@ -150,28 +150,29 @@ class Main():
 		# stampo i pacchetti con scapy
 		#criptedPacketList.show()
 
+		decryptedList = []
 		# prendo il secondo pacchetto che sicuramente è un pacchetto dati
-		#indexListFrom_1 = (5,6)
-		#indexListFrom_0 = []
-		#for j in range(len(indexListFrom_1)):
-		#	indexListFrom_0.append(indexListFrom_1[j] - 1)
-
-		#for i in indexListFrom_0:
-		try:
-			#print i
-			dataPack = criptedPacketList[1]
-			#dataPack.show()	
-			# provo a decriptarlo con le chiavi
-			decrypted = self.getDecriptedPacket(dataPack,tk,authenticatorMicKey,supplicantMicKey)
-			print "TKIP MIC OK"
-		except TKIPError:
-			print "TKIP MIC ERROR"
-			exit(-1)
+		
+		for i in range(len(criptedPacketList)):
+			try:
+				#print i
+				dataPack = criptedPacketList[i]
+				#dataPack.show()	
+				# provo a decriptarlo con le chiavi
+				decrypted = self.getDecriptedPacket(dataPack,tk,authenticatorMicKey,supplicantMicKey)
+				decryptedList.append(decrypted)
+				#print "ciao"
+				#decrypted.show()
+				#print "TKIP MIC OK"
+			except TKIPError:
+				#print "TKIP MIC ERROR"
+				exit(-1)
 
 		#stampo il pacchetto decriptato
 		print "END"
+		#for i in 
 		#decrypted.show()	
-
+		wrpcap(self.criptedPacketListName+'-dec',decryptedList)
 		#except PacketError as (error,mex):
 			#Errori sui pacchetti in input
 		#	print 'ERRORS in input packets'
