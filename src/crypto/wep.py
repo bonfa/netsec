@@ -73,6 +73,8 @@ class WepDecryption():
 		icv_received è una tupla
 		'''
 		icv_processed = crc32Tuple(plaintext)
+		#print 'processed' + str(icv_processed)
+		#print 'received' + str(icv_received)
 		return (icv_received == icv_processed)
 
 

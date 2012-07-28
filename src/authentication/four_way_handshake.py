@@ -6,8 +6,8 @@ Modulo che riceve i nomi dei quattro pacchetti del 4 way handshake, ne estrae i 
 '''
 
 #from packet_subfields import *
-#import sys
-#sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/utilities')
+import sys
+sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/utilities')
 from exception import PacketError
 from pack import Pacchetto
 from consistence_checker import FourWayHandshakeConsistenceChecker
@@ -99,10 +99,12 @@ class FourWayHandshakeManager():
 		pskGenerator = passphraseToPSKMap(self.pms,self.ssid)
 		psk = pskGenerator.getPsk()
 
+		print 'PMK = ' + str(packet_printer.stringInHex(psk))
 		#estraggo i due Nonce e i due macAddress
 		ANonce = self.p1.objectForm.payload.payload.key_nonce
 		SNonce = self.p2.objectForm.payload.payload.key_nonce
 		AA = self.p1.objectForm.header.source_address
+		print 'non = ' + str(struct.unpack('32B',ANonce))
 		SPA = self.p1.objectForm.header.destination_address
 
 		#genero le chiavi di sessione

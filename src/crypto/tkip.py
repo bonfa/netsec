@@ -83,9 +83,9 @@ class TkipDecryptor():
 		Estrae dal pacchetto scapy la stringa del src_address e la ritorna
 		'''
 		toDsFromDs = self.packet.FCfield & 0x3
-		if toDsFromDs==0 or toDsFromDs==2:
+		if toDsFromDs==0 or toDsFromDs==1:
 			macAddrScapy = str(self.packet.addr2)
-		elif toDsFromDs==1:
+		elif toDsFromDs==2:
 			macAddrScapy = str(self.packet.addr3)
 		elif toDsFromDs==3:
 			macAddrScapy = str(self.packet.addr4)
@@ -109,9 +109,9 @@ class TkipDecryptor():
 		Estrae dal pacchetto scapy la stringa del dst_address e la ritorna
 		'''
 		toDsFromDs = self.packet.FCfield & 0x3
-		if toDsFromDs==0 or toDsFromDs==1:
+		if toDsFromDs==0 or toDsFromDs==2:
 			macAddrScapy = str(self.packet.addr1)
-		elif toDsFromDs==2 or toDsFromDs==3:
+		elif toDsFromDs==1 or toDsFromDs==3:
 			macAddrScapy = str(self.packet.addr3)
 		else:
 			raise FlagException('toDsFromDs not in (0,1,2,3)','Error in flags')
@@ -220,7 +220,6 @@ class TKIP_Decryptor_Low():
 		micReceivedTuple = plaintextAndMic[-8:]
 		msduNoMic = plaintextAndMic[:-8]
 		micProcessed = self.getMic(msduNoMic)
-		
 
 		#print len(micProcessed)
 		print '   RECEIVED = ' + str(micReceivedTuple)
@@ -240,6 +239,7 @@ class TKIP_Decryptor_Low():
 		#preparo il pacchetto per il calcolo del MIC
 		paddedMSDU = self.getPaddedMSDU(msduNoMicStr)
 		#ritorna il mic
+		
 		#print 'LUNGH = ' + str(len(paddedMSDU))
 		formatStr = str(len(paddedMSDU))+'B'
 		paddedMSDUTuple = struct.unpack(formatStr,paddedMSDU)	
@@ -256,8 +256,9 @@ class TKIP_Decryptor_Low():
 		return --> tupla
 		'''
 		# Concateno i campi in ordine
-		#print 'DA = ' + str(struct.unpack('6B',self.da))
-		#print 'TA = ' + str(struct.unpack('6B',self.ta))
+		print 'SA = ' + str(struct.unpack('6B',self.sa))
+		print 'DA = ' + str(struct.unpack('6B',self.da))
+		print 'TA = ' + str(struct.unpack('6B',self.ta))
 		#print 'PRIO = ' + str(struct.unpack('1B',self.priority)[0])
 		
 		if (self.priority == None):

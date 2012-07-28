@@ -38,7 +38,7 @@ class Main():
 		self.NomePacchetto4_4Way = self.path + 'four_way_4'
 		self.pms = 'H6x&@!1uLQ*()!12c0x\\f^\'?|s<SNgh-'
 		self.ssid = 'WWWLAN'
-		self.criptedPacketListName = self.path + 'fish0all'
+		self.criptedPacketListName = self.path + 'dataOnly'
 		self.clearPacketListName = self.path + 'wlan0tcp80'
 		self.authenticatorAddressTuple = (0x00,0x18,0xe7,0x45,0x0e,0x22)		
 		self.supplicantAddressTuple = (0x00,0x19,0xd2,0x4a,0x39,0xb8)
@@ -114,16 +114,16 @@ class Main():
 		'''
 		Ritorna la chiave corretta per il calcolo del mic in funzione del mittente del pacchetto
 		'''
-		trasmitterMacAddressTuple = self.getSrcAddress(packet)
+		trasmitterMacAddressTuple = self.getTrasmitterMacAddr(packet)
 		if (trasmitterMacAddressTuple == self.authenticatorAddressTuple):
-			return authenticatorMicKey
+			return authenticatorMicKey #supplicantMicKey
 		elif (trasmitterMacAddressTuple == self.supplicantAddressTuple):	
-			return supplicantMicKey
+			return supplicantMicKey #authenticatorMicKey
 		else:
 			raise MacError('','trasmission address different both from authenticatorAddress and supplicantAddress')
 
 
-	def getSrcAddress(self,packet):
+	def getTrasmitterMacAddr(self,packet):
 		'''
 		Estrae dal pacchetto scapy la stringa del src_address e ritorna la tupla
 		'''
@@ -134,6 +134,7 @@ class Main():
 			macIntegerList.append(int(macAddrTuple[i],16))
 		i1,i2,i3,i4,i5,i6 = macIntegerList
 		return (i1,i2,i3,i4,i5,i6)
+
 
 	def execute(self):
 		# 4 way handshake	
@@ -147,7 +148,7 @@ class Main():
 		criptedPacketList = self.loadSessionPacket(self.criptedPacketListName)
 
 		# stampo i pacchetti con scapy
-		criptedPacketList.show()
+		#criptedPacketList.show()
 
 		# prendo il secondo pacchetto che sicuramente è un pacchetto dati
 		#indexListFrom_1 = (5,6)
@@ -158,8 +159,8 @@ class Main():
 		#for i in indexListFrom_0:
 		try:
 			#print i
-			dataPack = criptedPacketList[13]
-			dataPack.show()	
+			dataPack = criptedPacketList[1]
+			#dataPack.show()	
 			# provo a decriptarlo con le chiavi
 			decrypted = self.getDecriptedPacket(dataPack,tk,authenticatorMicKey,supplicantMicKey)
 			print "TKIP MIC OK"
