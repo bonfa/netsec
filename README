@@ -7,4 +7,6 @@ Il codice salta alcuni passaggi definiti nello standard, ad esempio il controllo
 
 Osservazione: il programma per funzionare ha bisogno di scapy
 
-main.py
+main.py  --> main, viene chiamato con un una serie di parametri in ingresso che specificano pmk, ssid i path dei file pcap che contengo ciascuno uno dei quattro pacchetti del 4 way handshake, il path del file pcap che contiene i dati criptati, un parametro 'True' nel caso in cui l'header mac fornisca l'FCS
+
+i file "decryptWWWLAN.py", "nicola_ipod.py", "nicola_pc.py", "wwwlan_july.py" sono degli script che chiamano "main.py" con diversi parametri in ingresso.
