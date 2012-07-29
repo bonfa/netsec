@@ -1,12 +1,10 @@
-manca tutto il discorso del groupkey exchange a partire dal parser
+Decripta una comunicazione 802.11 criptata con WPA nota la PMS
 
-STRANEZZE:
-1) il mio access point non cripta il messaggio 3 del 4way handshake (non rispetta il protocollo)
-2) wireshark non ha il campo SMK message tra i campi del key information --> probabilmente ignorato perchè non supportato dalla stazione o dal access point
-3) il campo keyRSC è sempre impostato a 0  --> (non rispetta il protocollo)
+Progetto scolastico. 
+Il codice salta alcuni passaggi definiti nello standard, ad esempio il controllo del TSC
 
+@TODO: refactoring del codice. Ci sono metodi ripetuti da estrarre da classi in cui sono contenuti.
 
-VARIABILI:
-1) data --> contiene solo RSN information element nei pacchetti 2 e 3 del 4way handshake. Nel primo pacchetto del group key handshake è criptato
+Osservazione: il programma per funzionare ha bisogno di scapy
 
-
+main.py
