@@ -8,7 +8,7 @@ sys.path.append('../utilities')
 sys.path.append('../common_utility')
 sys.path.append('../crypto')
 sys.path.append('../packetStruct')
-
+sys.path.append('../authentication')
 
 import pcap
 import sys
@@ -25,12 +25,12 @@ import packet_printer
 passphrase = 'H6x&@!1uLQ*()!12c0x\\f^\'?|s<SNgh-'
 ssid = 'WWWLAN'
 #psk = "3f4eb9a38ba03f3a28235fd038971be12845a57169c2801d729afa6711f6db96".decode("hex")	
-path = '../../pacchetti-catturati/'
+path = '../../pacchetti-catturati/wwwlan_01/'
 messaggioPerLaGenerazioneDiChiavi = "Pairwise key expansion"
-NomeDelPacchetto1DelFourWayHandshake = path + 'four_way_1'
-NomeDelPacchetto2DelFourWayHandshake = path + 'four_way_2'
-NomeDelPacchetto3DelFourWayHandshake = path + 'four_way_3'
-NomeDelPacchetto4DelFourWayHandshake = path + 'four_way_4'
+NomeDelPacchetto1DelFourWayHandshake = path + 'four_way_1.pcap'
+NomeDelPacchetto2DelFourWayHandshake = path + 'four_way_2.pcap'
+NomeDelPacchetto3DelFourWayHandshake = path + 'four_way_3.pcap'
+NomeDelPacchetto4DelFourWayHandshake = path + 'four_way_4.pcap'
 
 
 

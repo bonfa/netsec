@@ -19,7 +19,7 @@ import packet_printer
 from packet_parser import Splitter
 
 # test del parsing negli oggetti
-filename = '../../pacchetti-catturati/cattura1'
+filename = '../../pacchetti-catturati/wwwlan_01/fourWayHandshake.pcap'
 
 # creo l'oggetto che si interfaccia alla libpcap
 packet_list = pcap.pcapObject()
