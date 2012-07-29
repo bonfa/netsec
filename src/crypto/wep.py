@@ -76,7 +76,7 @@ class WepDecryption():
 		#print 'processed' + str(icv_processed)
 		#print 'received' + str(icv_received)
 		return (icv_received == icv_processed)
-
+		#return True
 
 
 class WepEncryption():

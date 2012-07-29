@@ -15,5 +15,5 @@ pms = 'BaX\'vN66pr'
 ssid = 'NicolaZ_Net'
 
 # Eseguo PlateDetector sull'immagine
-wpaDecryptor = subprocess.Popen([sys.executable,"./main.py",pms,ssid,NomePacchetto1_4Way,NomePacchetto2_4Way,NomePacchetto3_4Way,NomePacchetto4_4Way,nomePacchettoDati],stdout=None, stderr=None) 
+wpaDecryptor = subprocess.Popen([sys.executable,"./main.py",pms,ssid,NomePacchetto1_4Way,NomePacchetto2_4Way,NomePacchetto3_4Way,NomePacchetto4_4Way,nomePacchettoDati,'True'],stdout=None, stderr=None) 
 decriptorStatus = wpaDecryptor.communicate()

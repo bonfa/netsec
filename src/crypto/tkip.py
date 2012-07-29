@@ -41,10 +41,11 @@ class TkipDecryptor():
 	packet è un pacchetto scapy
 	temporalKey, micKey sono stringhe		
 	'''
-	def __init__(self,packet,temporalKey,micKey):
+	def __init__(self,packet,temporalKey,micKey,fcsPresent=False):
 		self.packet = packet
 		self.temporalKey = temporalKey
 		self.micKey = micKey
+		self.fcsPresent = fcsPresent
 
 			
 
@@ -96,8 +97,11 @@ class TkipDecryptor():
 		'''
 		Estrae dal pacchetto scapy la stringa del cipher_text e la ritorna
 		'''
-		icvStr = struct.pack('>I',self.packet.icv)
-		return self.packet.wepdata[4:] + icvStr
+		if (self.fcsPresent):
+			return self.packet.wepdata[4:]
+		else:
+			icvStr = struct.pack('>I',self.packet.icv)
+			return self.packet.wepdata[4:] + icvStr
 	
 
 	

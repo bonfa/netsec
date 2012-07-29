@@ -25,13 +25,14 @@ from packet_subfields import getEapolKeyPart,printPacket
 from four_way_handshake import FourWayHandshakeManager
 from four_way_handshake_v2 import FourWayHandshakeManagerWithScapyOnly
 import binascii
-from exception import PacketError,TKIPError,MacError
+from exception import PacketError,TKIPError,MacError,WepError
 from tkip import TkipDecryptor
+
 
 
 class Main():
 
-	def __init__(self,pms,ssid,path1,path2,path3,path4,dataPath):
+	def __init__(self,pms,ssid,path1,path2,path3,path4,dataPath,fcsPresent):
 		#definisco le variabili principali
 		self.NomePacchetto1_4Way = path1
 		self.NomePacchetto2_4Way = path2
@@ -42,6 +43,7 @@ class Main():
 		self.criptedPacketListName = dataPath
 		self.authenticatorAddressTuple = self.getAuthenticatorAddress()
 		self.supplicantAddressTuple = self.getSupplicantAddress()
+		self.fcsPresent = fcsPresent
 
 
 
@@ -114,12 +116,12 @@ class Main():
 
 
 
-	def getDecriptedPacket(self,criptedPacket,temporalKey,authenticatorMicKey,supplicantMicKey):
+	def getDecriptedPacket(self,criptedPacket,temporalKey,authenticatorMicKey,supplicantMicKey,fcsPresent):
 		'''
 		Prende in ingresso un pacchetto criptato e lo decripta
 		'''
 		micKey = self.getProperMicKey(criptedPacket,authenticatorMicKey,supplicantMicKey)
-		decryptor = TkipDecryptor(criptedPacket,temporalKey,micKey)
+		decryptor = TkipDecryptor(criptedPacket,temporalKey,micKey,fcsPresent)
 		plaintext = decryptor.getDecryptedPacket()
 		return plaintext	
 	
@@ -231,9 +233,12 @@ class Main():
 			try:
 				dataPack = criptedPacketList[i]
 				# provo a decriptarlo con le chiavi
-				decrypted = self.getDecriptedPacket(dataPack,tk,authenticatorMicKey,supplicantMicKey)
+				decrypted = self.getDecriptedPacket(dataPack,tk,authenticatorMicKey,supplicantMicKey,self.fcsPresent)
 				decryptedList.append(decrypted)
 				decriptati = decriptati + 1
+			except WepError as e:
+				#print 'wep error'
+				nonDecriptati = nonDecriptati + 1 			
 			except Exception as e:
 				nonDecriptati = nonDecriptati + 1 
 
@@ -250,7 +255,15 @@ class Main():
 
 
 if __name__ == '__main__':
-	if len(sys.argv) != 8:
+	if len(sys.argv) == 8: 
+		pms,ssid,path1,path2,path3,path4,dataPath = sys.argv[1:]
+		m = Main(pms,ssid,path1,path2,path3,path4,dataPath,False)
+		m.execute()	
+	elif len(sys.argv) == 9 and sys.argv[8]=='True':
+		pms,ssid,path1,path2,path3,path4,dataPath = sys.argv[1:8]
+		m = Main(pms,ssid,path1,path2,path3,path4,dataPath,True)
+		m.execute()
+	else:
 		print "Wrong parameters number"
 		print "Input parameters must be as follows:"
 		print 2*' ' + 'pms'
@@ -260,13 +273,8 @@ if __name__ == '__main__':
 		print 2*' ' + 'four_way_handshake_message_3_path'
 		print 2*' ' + 'four_way_handshake_message_4_path'
 		print 2*' ' + 'pcap_file_path'
+		print 2*' ' + "['True'] if fcs is present"
 		sys.exit()
-	else:
-		pms,ssid,path1,path2,path3,path4,dataPath = sys.argv[1:]
-		m = Main(pms,ssid,path1,path2,path3,path4,dataPath)
-		m.execute()
-
-
 
 
 
