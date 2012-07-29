@@ -218,7 +218,7 @@ class Main():
 		# 4 way handshake	
 		tk,authenticatorMicKey,supplicantMicKey = self.doFourWayHandshake(self.NomePacchetto1_4Way,self.NomePacchetto2_4Way,self.NomePacchetto3_4Way,self.NomePacchetto4_4Way,self.pms,self.ssid)
 		
-		self.printKeys(tk,authenticatorMicKey,supplicantMicKey)
+		#self.printKeys(tk,authenticatorMicKey,supplicantMicKey)
 
 		# load session packets
 		criptedPacketList = self.loadSessionPacket(self.criptedPacketListName)
@@ -243,9 +243,9 @@ class Main():
 		
 		# stampo un breve report
 		print "[RESULTS]"
-		print '  ' + 'totale pacchetti = ' + str(len(criptedPacketList))
-		print '  ' + 'decriptati = ' + str(decriptati)
-		print '  ' + 'non decriptati = ' + str(nonDecriptati)
+		print '  ' + 'Total number of packets read = ' + str(len(criptedPacketList))
+		print '  ' + 'Number of decrypted packets = ' + str(decriptati)
+		print '  ' + 'Number of non-decrypted packets = ' + str(nonDecriptati)
 
 
 

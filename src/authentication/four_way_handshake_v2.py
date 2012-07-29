@@ -101,10 +101,10 @@ class FourWayHandshakeManagerWithScapyOnly():
 		AA = self.getSrcAddress(self.p1.scapyForm)
 		SPA = self.getSrcAddress(self.p2.scapyForm)
 
-		print 'AN = ' + ANonce
-		print 'SN = ' + SNonce
-		print 'AA = ' + str(AA)
-		print 'SA = ' + str(SPA)
+		#print 'AN = ' + ANonce
+		#print 'SN = ' + SNonce
+		#print 'AA = ' + str(AA)
+		#print 'SA = ' + str(SPA)
 		#genero le chiavi di sessione
 		keyGen = keyGenerator(psk,self.mex,AA,SPA,ANonce,SNonce)
 		[kck,kek,tk,authenticatorMicKey,supplicantMicKey] = keyGen.getKeys()
