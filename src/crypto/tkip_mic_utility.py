@@ -4,9 +4,9 @@
 Contiene le utility necessarie a effettuare il MIC del 4 way handshake
 '''
 import sys
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/common_utility')
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/packetStruct')
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/utilities')
+sys.path.append('../common_utility')
+sys.path.append('../packetStruct')
+sys.path.append('../utilities')
 import struct
 from exception import micKeyLenghtException
 from base_operations import leftRotationOperation,rightRotationOperation,NegativeShiftValueException

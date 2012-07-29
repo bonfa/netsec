@@ -4,7 +4,7 @@
 Testa le operazioni del modulo tkip_sbox
 '''
 import sys
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
+sys.path.append('../crypto')
 import unittest
 import struct
 import tkip_sboxes

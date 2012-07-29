@@ -5,7 +5,7 @@ Testa le operazioni del modulo rc4
 OSS: nei test del crc-32 il pack viene fatto in modi diversi (vedi 'testCrc32_2' e 'testCrc32_3' --> struct.unpack) 
 '''
 import sys
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
+sys.path.append('../crypto')
 import wep
 import unittest
 import struct

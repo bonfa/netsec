@@ -7,8 +7,8 @@ Effettua le due operazioni di encryption e decryption del wep
 
 import binascii
 import sys
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/utilities')
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
+sys.path.append('../utilities')
+sys.path.append('../crypto')
 from exception import WepError
 from rc4 import arcFour
 import struct

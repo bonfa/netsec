@@ -5,7 +5,7 @@ Testa le operazioni del modulo rc4
 OSS: in tutti i test il tsc è definito con i byte inversi rispetto al test vector
 '''
 import sys
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
+sys.path.append('../crypto')
 from rc4 import arcFour
 import unittest
 import struct

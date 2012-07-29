@@ -7,8 +7,8 @@ Effettua le due operazioni di encryption e decryption del tkip
 
 from scapy.all import *
 import sys
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/utilities')
+sys.path.append('../crypto')
+sys.path.append('../utilities')
 from tkip_functions import TKIPmixingFunction
 from exception import TKIPError,FlagException
 import struct

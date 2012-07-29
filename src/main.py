@@ -6,12 +6,12 @@
 '''
 
 import sys
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/utilities')
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/common_utility')
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/packetStruct')
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/authentication')
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src')
+sys.path.append('./utilities')
+sys.path.append('./common_utility')
+sys.path.append('./crypto')
+sys.path.append('./packetStruct')
+sys.path.append('./authentication')
+#sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src')
 
 # Set log level to benefit from Scapy warnings
 import logging

@@ -5,7 +5,7 @@ Questo modulo contiene la classe che si occupa di effettuare l'encryption RC4
 '''
 
 import sys
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/common_utility')
+sys.path.append('../common_utility')
 
 
 class arcFour:

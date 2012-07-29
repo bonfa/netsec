@@ -7,7 +7,7 @@ Modulo che riceve i nomi dei quattro pacchetti del 4 way handshake, ne estrae i 
 
 #from packet_subfields import *
 import sys
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/utilities')
+sys.path.append('../utilities')
 from exception import PacketError
 from pack import Pacchetto
 from consistence_checker import FourWayHandshakeConsistenceChecker

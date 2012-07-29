@@ -4,7 +4,7 @@
 Testa le operazioni del modulo 
 '''
 import sys
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/authentication')
+sys.path.append('../authentication')
 from four_way_crypto_utility import keyGenerator
 import unittest
 import struct

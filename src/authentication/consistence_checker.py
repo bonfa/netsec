@@ -8,7 +8,7 @@ Modulo che si occupa di controllare se i pacchetti sono coerenti
 
 from packet_subfields import *
 import sys
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/utilities')
+sys.path.append('../utilities')
 from exception import PacketError
 
 tab = 4 * ' '

@@ -4,7 +4,7 @@
 Testa le operazioni della clase base_operation
 '''
 import sys
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/common_utility')
+sys.path.append('../common_utility')
 from base_operations import leftRotationOperation,rightRotationOperation,NegativeShiftValueException,high8,low8,mk16
 import unittest
 import struct

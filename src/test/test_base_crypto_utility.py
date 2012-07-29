@@ -4,7 +4,7 @@
 Testa le operazioni della clase crypto_utility
 '''
 import sys
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/crypto')
+sys.path.append('../crypto')
 import base_crypto_utility
 import unittest
 import struct

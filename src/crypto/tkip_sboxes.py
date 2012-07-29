@@ -4,7 +4,7 @@
 Contiene le sbox necessarie alla mixing function del tkip e le funzioni che ritornano i valori corretti
 '''
 import sys
-sys.path.append('/media/DATA/06-WorkSpace/netsec_wp/src/common_utility')
+sys.path.append('../common_utility')
 from base_operations import low8,high8
 
 
